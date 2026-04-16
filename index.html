@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مرسم التعلم — ألعاب تعليمية تفاعلية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== TOKENS ===== */
+:root {
+  --sky:    #87CEEB;
+  --sky2:   #B8E8FF;
+  --orange: #FF6B35;
+  --orange2:#FFB347;
+  --gold:   #FFD600;
+  --teal:   #00B4D8;
+  --teal2:  #48CAE4;
+  --purple: #6C3FBE;
+  --purple2:#9D6FE8;
+  --green:  #27AE60;
+  --green2: #52D68A;
+  --red:    #E74C3C;
+  --white:  #FFFFFF;
+  --bg:     #F0F8FF;
+  --text:   #1a1a3e;
+  --text2:  #555577;
+  --card:   rgba(255,255,255,0.92);
+  --radius: 24px;
+  --shadow: 0 8px 32px rgba(44,44,84,0.10);
+  --shadow-lg: 0 16px 48px rgba(44,44,84,0.15);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 2px solid rgba(255,214,0,0.3);
+  padding: 0 6%;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+}
+
+.nav-logo {
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--orange);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-logo span { color: var(--purple); }
+
+.nav-links {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--text2);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  border-radius: 50px;
+  transition: all 0.2s;
+}
+.nav-links a:hover {
+  background: var(--gold);
+  color: var(--text);
+}
+
+.nav-cta {
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  color: white !important;
+  box-shadow: 0 4px 0 #c05010;
+  transform: translateY(0);
+  transition: all 0.2s !important;
+}
+.nav-cta:hover {
+  transform: translateY(-2px) !important;
+  background: linear-gradient(135deg, var(--orange), var(--orange2)) !important;
+  color: white !important;
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 100px 6% 60px;
+  background: linear-gradient(180deg, #87CEEB 0%, #B8E8FF 50%, #c8f0d0 80%, #90EE90 100%);
+}
+
+/* background decorative circles */
+.hero-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+  animation: floatY ease-in-out infinite;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 780px;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: white;
+  border: 2.5px solid var(--gold);
+  color: var(--purple);
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 6px 20px;
+  border-radius: 50px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 0 #e6c000;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hero-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 4px 0 rgba(180,80,0,0.25), 0 8px 24px rgba(0,0,0,0.12);
+  line-height: 1.2;
+  margin-bottom: 18px;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.hero-title .accent {
+  color: var(--gold);
+  -webkit-text-stroke: 1px rgba(200,100,0,0.2);
+}
+
+.hero-sub {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.92);
+  max-width: 540px;
+  margin: 0 auto 36px;
+  line-height: 1.7;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 30px;
+  border-radius: 50px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.btn:hover { transform: translateY(-3px); }
+.btn:active { transform: translateY(1px) scale(0.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--orange), #FF9A00);
+  color: white;
+  box-shadow: 0 6px 0 #b03a00, 0 10px 24px rgba(255,107,53,0.35);
+}
+.btn-secondary {
+  background: white;
+  color: var(--purple);
+  border: 3px solid var(--purple2);
+  box-shadow: 0 4px 0 #5a2fa0, 0 8px 20px rgba(108,63,190,0.15);
+}
+
+/* hero floating emojis */
+.hero-emojis {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.h-emoji {
+  position: absolute;
+  font-size: 2.2rem;
+  animation: floatY ease-in-out infinite;
+  opacity: 0.8;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+/* hero stats strip */
+.hero-stats {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 50px;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.stat-card {
+  background: rgba(255,255,255,0.82);
+  border: 2.5px solid rgba(255,255,255,0.9);
+  border-radius: 20px;
+  padding: 14px 24px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08);
+}
+.stat-card .sv { font-size: 2rem; font-weight: 900; color: var(--orange); line-height: 1; }
+.stat-card .sl { font-size: 0.78rem; color: var(--purple); font-weight: 700; margin-top: 3px; }
+
+/* ground decoration */
+.ground-deco {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, transparent, rgba(90,180,90,0.3));
+  pointer-events: none;
+}
+
+/* ===== SECTION BASE ===== */
+.section {
+  padding: 90px 6%;
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.section-eyebrow {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 10px;
+  background: rgba(0,180,216,0.1);
+  padding: 5px 16px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(0,180,216,0.25);
+}
+.section-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.section-sub {
+  font-size: 1.05rem;
+  color: var(--text2);
+  font-weight: 600;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ===== GAMES SECTION ===== */
+.games-section {
+  background: linear-gradient(180deg, var(--bg) 0%, #e8f4ff 100%);
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 24px;
+}
+
+.game-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2.5px solid rgba(255,255,255,0.9);
+  box-shadow: var(--shadow);
+  transition: transform 0.25s, box-shadow 0.25s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+.game-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.game-thumb {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.game-thumb-emojis {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+  animation: floatY 3s ease-in-out infinite;
+}
+
+.game-body { padding: 20px; flex: 1; }
+.game-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 50px;
+  margin-bottom: 10px;
+}
+.tag-arabic  { background: #FFF9C4; color: #856400; border: 1.5px solid #FFD600; }
+.tag-math    { background: #E3F2FD; color: #1565C0; border: 1.5px solid #90CAF9; }
+.tag-science { background: #E8F5E9; color: #2E7D32; border: 1.5px solid #A5D6A7; }
+.tag-new     { background: #FCE4EC; color: #880E4F; border: 1.5px solid #F48FB1; }
+
+.game-name {
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.game-desc {
+  font-size: 0.88rem;
+  color: var(--text2);
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.game-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.game-level {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.game-footer {
+  padding: 14px 20px;
+  border-top: 1.5px solid rgba(0,0,0,0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.play-btn {
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #007a9a;
+  transition: transform 0.15s;
+  text-decoration: none;
+  display: inline-block;
+}
+.play-btn:hover { transform: translateY(-2px); }
+
+.coming-soon-card {
+  opacity: 0.6;
+  cursor: default;
+}
+.coming-soon-card:hover { transform: none; }
+.coming-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #888;
+  background: #f0f0f0;
+  padding: 6px 16px;
+  border-radius: 50px;
+}
+
+/* ===== TUTORIALS SECTION ===== */
+.tutorials-section {
+  background: white;
+}
+
+.tutorials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tutorial-card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 24px 28px;
+  border: 2px solid #f0f0f0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+.tutorial-card:hover {
+  transform: translateX(-6px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+  border-color: var(--gold);
+}
+
+.tut-num {
+  width: 54px; height: 54px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: white;
+  flex-shrink: 0;
+}
+
+.tut-body { flex: 1; }
+.tut-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.tut-desc {
+  font-size: 0.88rem;
+  color: var(--text2);
+  font-weight: 600;
+  line-height: 1.6;
+}
+.tut-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.tut-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 50px;
+  background: #f5f5f5;
+  color: #666;
+}
+
+.tut-arrow {
+  font-size: 1.4rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.tutorial-card:hover .tut-arrow { transform: translateX(-4px); }
+
+.tut-coming {
+  opacity: 0.5;
+  cursor: default;
+}
+.tut-coming:hover { transform: none; border-color: #f0f0f0; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+
+/* ===== HOW IT WORKS ===== */
+.how-section {
+  background: linear-gradient(135deg, #1a1a3e 0%, #2d1b6e 50%, #1a3a5c 100%);
+  color: white;
+}
+
+.how-section .section-eyebrow {
+  color: var(--gold);
+  background: rgba(255,214,0,0.15);
+  border-color: rgba(255,214,0,0.3);
+}
+.how-section .section-title { color: white; }
+.how-section .section-sub   { color: rgba(255,255,255,0.75); }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.step-card {
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 22px;
+  padding: 28px 24px;
+  text-align: center;
+  transition: background 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  opacity: 0.06;
+}
+.step-card:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-4px);
+}
+
+.step-icon {
+  font-size: 2.8rem;
+  margin-bottom: 14px;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
+}
+.step-num {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  background: rgba(255,214,0,0.2);
+  color: var(--gold);
+  border-radius: 50px;
+  padding: 3px 10px;
+  border: 1px solid rgba(255,214,0,0.3);
+}
+.step-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 8px;
+}
+.step-desc {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.65);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+/* step connectors */
+.steps-wrapper { position: relative; }
+
+/* ===== CTA SECTION ===== */
+.cta-section {
+  background: linear-gradient(135deg, var(--orange) 0%, #FF9A00 50%, var(--gold) 100%);
+  text-align: center;
+  padding: 80px 6%;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.cta-section .section-title { color: white; position: relative; }
+.cta-section p { color: rgba(255,255,255,0.9); font-weight: 700; margin-bottom: 30px; font-size: 1.1rem; position: relative; }
+.btn-white {
+  background: white;
+  color: var(--orange);
+  border-radius: 50px;
+  padding: 15px 36px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.15), 0 12px 30px rgba(0,0,0,0.15);
+  display: inline-block;
+  transition: transform 0.2s;
+  position: relative;
+}
+.btn-white:hover { transform: translateY(-3px); }
+
+/* ===== FOOTER ===== */
+footer {
+  background: #0f0f2a;
+  color: rgba(255,255,255,0.6);
+  padding: 40px 6%;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.footer-tagline { font-size: 0.9rem; margin-bottom: 24px; }
+.footer-links {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.footer-links a {
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--gold); }
+.footer-copy { font-size: 0.8rem; opacity: 0.4; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes floatY {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  nav { padding: 0 5%; }
+  .nav-links { display: none; }
+  .hero { padding: 90px 5% 50px; }
+  .section { padding: 60px 5%; }
+  .tutorial-card { flex-direction: column; gap: 14px; }
+  .tut-arrow { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <a class="nav-logo" href="index.html">🎨 <span>مرسم</span> التعلم</a>
+  <ul class="nav-links">
+    <li><a href="#games">الألعاب</a></li>
+    <li><a href="#tutorials">الدروس</a></li>
+    <li><a href="#how">كيف يعمل؟</a></li>
+    <li><a href="tutorials/index.html" class="nav-cta">ابدأ التعلم 🚀</a></li>
+  </ul>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <!-- floating bg circles -->
+  <div class="hero-bg-circle" style="width:300px;height:300px;background:#FF6B35;top:-80px;right:-60px;animation-duration:7s;"></div>
+  <div class="hero-bg-circle" style="width:200px;height:200px;background:#FFD600;bottom:10%;left:-50px;animation-duration:5s;animation-delay:1s;"></div>
+  <div class="hero-bg-circle" style="width:150px;height:150px;background:#00B4D8;top:40%;left:5%;animation-duration:6s;animation-delay:2s;"></div>
+
+  <!-- floating emojis -->
+  <div class="hero-emojis">
+    <span class="h-emoji" style="top:15%;right:8%;animation-duration:4s;">📚</span>
+    <span class="h-emoji" style="top:25%;left:6%;animation-duration:5s;animation-delay:0.5s;">🎮</span>
+    <span class="h-emoji" style="bottom:28%;right:10%;animation-duration:3.5s;animation-delay:1s;">⭐</span>
+    <span class="h-emoji" style="bottom:35%;left:8%;animation-duration:4.5s;animation-delay:1.5s;">🏆</span>
+    <span class="h-emoji" style="top:10%;left:30%;animation-duration:6s;animation-delay:0.8s;">✏️</span>
+    <span class="h-emoji" style="bottom:20%;right:30%;animation-duration:5.5s;animation-delay:0.3s;">🌟</span>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">🌟 منصة تعليمية مجانية ومفتوحة المصدر</div>
+    <h1 class="hero-title">
+      ألعاب تعليمية<br>
+      <span class="accent">تفاعلية وممتعة</span><br>
+      لكل فصل دراسي
+    </h1>
+    <p class="hero-sub">
+      العب، تعلم، وتعلّم كيف تصنع ألعابك التعليمية بنفسك.
+      مكتبة متنامية من الألعاب المجانية ودروس خطوة بخطوة.
+    </p>
+    <div class="hero-btns">
+      <a href="#games" class="btn btn-primary">🎮 استكشف الألعاب</a>
+      <a href="#tutorials" class="btn btn-secondary">📖 تعلم كيف تصنع</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-card">
+        <div class="sv">1</div>
+        <div class="sl">🎮 لعبة متاحة</div>
+      </div>
+      <div class="stat-card">
+        <div class="sv">3</div>
+        <div class="sl">📖 دروس قادمة</div>
+      </div>
+      <div class="stat-card">
+        <div class="sv">100%</div>
+        <div class="sl">🆓 مجاني دائماً</div>
+      </div>
+    </div>
+  </div>
+  <div class="ground-deco"></div>
+</section>
+
+<!-- ===== GAMES ===== -->
+<section class="section games-section" id="games">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">🎮 مكتبة الألعاب</div>
+    <h2 class="section-title">العب وتعلم في نفس الوقت</h2>
+    <p class="section-sub">ألعاب تفاعلية مصممة بعناية للفصل الدراسي — تعمل على أي جهاز بدون إنترنت</p>
+  </div>
+
+  <div class="games-grid">
+
+    <!-- لعبة تركيب الجمل -->
+    <a href="games/sentence-builder/index.html" class="game-card reveal">
+      <div class="game-thumb" style="background:linear-gradient(135deg,#87CEEB,#B8E8FF);">
+        <span class="game-thumb-emojis">🐦📝</span>
+      </div>
+      <div class="game-body">
+        <span class="game-tag tag-arabic">🔤 اللغة العربية</span>
+        <span class="game-tag tag-new">✨ جديد</span>
+        <div class="game-name">لعبة تركيب الجمل</div>
+        <div class="game-desc">رتّب الكلمات لتكوين جملة مفيدة! لعبة تعاونية لاعبان يتناوبان في اختيار الكلمات مع موقت ونجوم.</div>
+        <div class="game-meta">
+          <span class="game-level">👥 لاعبان</span>
+          <span class="game-level">⏱️ موقت</span>
+          <span class="game-level">🌱 المراحل الابتدائية</span>
+        </div>
+      </div>
+      <div class="game-footer">
+        <span style="font-size:0.8rem;color:#aaa;font-weight:700;">10 جمل • 3 مستويات</span>
+        <span class="play-btn">العب الآن ←</span>
+      </div>
+    </a>
+
+    <!-- قادمة قريباً 1 -->
+    <div class="game-card coming-soon-card reveal">
+      <div class="game-thumb" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);">
+        <span class="game-thumb-emojis" style="animation-delay:0.5s;">🔢➕</span>
+      </div>
+      <div class="game-body">
+        <span class="game-tag tag-math">🔢 الرياضيات</span>
+        <div class="game-name">لعبة العمليات الحسابية</div>
+        <div class="game-desc">تنافس مع زميلك في حل مسائل الجمع والطرح والضرب بشكل ممتع وسريع.</div>
+        <div class="game-meta">
+          <span class="game-level">👥 لاعبان</span>
+          <span class="game-level">⏱️ موقت</span>
+          <span class="game-level">🌱🌟 ابتدائي</span>
+        </div>
+      </div>
+      <div class="game-footer">
+        <span style="font-size:0.8rem;color:#aaa;font-weight:700;">قادمة قريباً</span>
+        <span class="coming-badge">🔒 قريباً</span>
+      </div>
+    </div>
+
+    <!-- قادمة قريباً 2 -->
+    <div class="game-card coming-soon-card reveal">
+      <div class="game-thumb" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);">
+        <span class="game-thumb-emojis" style="animation-delay:1s;">🌍🗺️</span>
+      </div>
+      <div class="game-body">
+        <span class="game-tag tag-science">🌿 العلوم</span>
+        <div class="game-name">لعبة تصنيف الكائنات</div>
+        <div class="game-desc">صنّف النباتات والحيوانات في مجموعاتها الصحيحة قبل نفاد الوقت!</div>
+        <div class="game-meta">
+          <span class="game-level">👤 لاعب واحد</span>
+          <span class="game-level">⏱️ موقت</span>
+          <span class="game-level">🌟 متوسط</span>
+        </div>
+      </div>
+      <div class="game-footer">
+        <span style="font-size:0.8rem;color:#aaa;font-weight:700;">قادمة قريباً</span>
+        <span class="coming-badge">🔒 قريباً</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== TUTORIALS ===== -->
+<section class="section tutorials-section" id="tutorials">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">📖 دروس تعليمية</div>
+    <h2 class="section-title">تعلّم كيف تصنع ألعابك بنفسك</h2>
+    <p class="section-sub">دروس خطوة بخطوة من الصفر — لا تحتاج خبرة برمجية مسبقة</p>
+  </div>
+
+  <div class="tutorials-list">
+
+    <a href="tutorials/how-to-build-a-game.html" class="tutorial-card reveal">
+      <div class="tut-num" style="background:linear-gradient(135deg,#FF6B35,#FF9A00);">1</div>
+      <div class="tut-body">
+        <div class="tut-title">كيف تبني لعبة تعليمية من الصفر بمساعدة الذكاء الاصطناعي</div>
+        <div class="tut-desc">من الفكرة إلى الملف الجاهز — سنبني معاً لعبة كاملة خطوة بخطوة باستخدام Claude.</div>
+        <div class="tut-tags">
+          <span class="tut-tag">⏱️ 20 دقيقة</span>
+          <span class="tut-tag">🟢 مبتدئ</span>
+          <span class="tut-tag">🤖 Claude AI</span>
+          <span class="tut-tag">📄 HTML</span>
+        </div>
+      </div>
+      <div class="tut-arrow">←</div>
+    </a>
+
+    <div class="tutorial-card tut-coming reveal">
+      <div class="tut-num" style="background:linear-gradient(135deg,#00B4D8,#48CAE4);">2</div>
+      <div class="tut-body">
+        <div class="tut-title">كيف تضيف موقتاً وتحكماً للمعلم في أي لعبة</div>
+        <div class="tut-desc">تعلم كيف تجعل لعبتك قابلة للتخصيص من طرف المعلم — الوقت، الجمل، المستويات.</div>
+        <div class="tut-tags">
+          <span class="tut-tag">⏱️ 15 دقيقة</span>
+          <span class="tut-tag">🟡 متوسط</span>
+          <span class="tut-tag">⚙️ قادم قريباً</span>
+        </div>
+      </div>
+      <div class="tut-arrow">←</div>
+    </div>
+
+    <div class="tutorial-card tut-coming reveal">
+      <div class="tut-num" style="background:linear-gradient(135deg,#6C3FBE,#9D6FE8);">3</div>
+      <div class="tut-body">
+        <div class="tut-title">كيف تجعل لعبتك تقبل أكثر من إجابة صحيحة</div>
+        <div class="tut-desc">تقنية الإجابات المتعددة في ألعاب اللغة العربية — مع أمثلة عملية من لعبة تركيب الجمل.</div>
+        <div class="tut-tags">
+          <span class="tut-tag">⏱️ 10 دقيقة</span>
+          <span class="tut-tag">🟡 متوسط</span>
+          <span class="tut-tag">⚙️ قادم قريباً</span>
+        </div>
+      </div>
+      <div class="tut-arrow">←</div>
+    </div>
+
+    <div class="tutorial-card tut-coming reveal">
+      <div class="tut-num" style="background:linear-gradient(135deg,#27AE60,#52D68A);">4</div>
+      <div class="tut-body">
+        <div class="tut-title">كيف تنشر لعبتك مجاناً على الإنترنت</div>
+        <div class="tut-desc">خطوة بخطوة: أنشئ موقعاً مجانياً على GitHub Pages وشارك ألعابك مع العالم.</div>
+        <div class="tut-tags">
+          <span class="tut-tag">⏱️ 25 دقيقة</span>
+          <span class="tut-tag">🟢 مبتدئ</span>
+          <span class="tut-tag">🌐 GitHub Pages</span>
+          <span class="tut-tag">⚙️ قادم قريباً</span>
+        </div>
+      </div>
+      <div class="tut-arrow">←</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section how-section" id="how">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">⚡ كيف يعمل؟</div>
+    <h2 class="section-title">من الفكرة إلى اللعبة في 4 خطوات</h2>
+    <p class="section-sub">لا تحتاج خبرة برمجية — فقط فكرة وساعة من وقتك</p>
+  </div>
+
+  <div class="steps-grid">
+    <div class="step-card reveal">
+      <span class="step-num">01</span>
+      <span class="step-icon">💡</span>
+      <div class="step-title">صف فكرتك</div>
+      <div class="step-desc">أخبر Claude بالمادة الدراسية والمرحلة والنشاط الذي تريده — بالعربية الدارجة.</div>
+    </div>
+    <div class="step-card reveal" style="transition-delay:0.1s">
+      <span class="step-num">02</span>
+      <span class="step-icon">🤖</span>
+      <div class="step-title">Claude يبني اللعبة</div>
+      <div class="step-desc">في دقائق يولّد Claude ملف HTML كامل — ألوان، صوت، موقت، وتصميم احترافي.</div>
+    </div>
+    <div class="step-card reveal" style="transition-delay:0.2s">
+      <span class="step-num">03</span>
+      <span class="step-icon">✏️</span>
+      <div class="step-title">خصّص وعدّل</div>
+      <div class="step-desc">أضف جملك وصورك، عدّل الوقت والمستويات — كل شيء في نافذة الإعدادات بدون كود.</div>
+    </div>
+    <div class="step-card reveal" style="transition-delay:0.3s">
+      <span class="step-num">04</span>
+      <span class="step-icon">🌐</span>
+      <div class="step-title">انشر وشارك</div>
+      <div class="step-desc">احفظ الملف، ارفعه على GitHub Pages، وشارك الرابط مع تلاميذك وزملائك.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section">
+  <h2 class="section-title" style="margin-bottom:12px;">ابدأ بناء أول لعبة لك اليوم 🚀</h2>
+  <p>الدرس الأول مجاني تماماً — من الفكرة إلى الملف الجاهز في 20 دقيقة</p>
+  <a href="tutorials/how-to-build-a-game.html" class="btn-white">ابدأ الدرس الأول ←</a>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-logo">🎨 مرسم التعلم</div>
+  <div class="footer-tagline">ألعاب تعليمية تفاعلية مجانية للجميع</div>
+  <div class="footer-links">
+    <a href="#games">الألعاب</a>
+    <a href="#tutorials">الدروس</a>
+    <a href="#how">كيف يعمل؟</a>
+  </div>
+  <div class="footer-copy">صُنع بـ ❤️ للمعلمين والمتعلمين العرب</div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
