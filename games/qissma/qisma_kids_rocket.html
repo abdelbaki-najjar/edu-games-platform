@@ -1,0 +1,524 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes star-twinkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+@keyframes slide-in{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes confetti-fall{0%{top:-10px;opacity:1}100%{top:110%;opacity:0}}
+@keyframes pulse-ring{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.6);opacity:0}}
+
+.wrap{background:linear-gradient(135deg,#0d1b4b 0%,#1a2e6b 40%,#0d3b5e 100%);min-height:100vh;padding:0;font-family:'Segoe UI',Tahoma,sans-serif;direction:rtl;position:relative;overflow:hidden;}
+
+.star{position:absolute;background:#fff;border-radius:50%;animation:star-twinkle var(--dur,2s) ease-in-out infinite var(--del,0s);}
+
+.header{text-align:center;padding:24px 16px 12px;position:relative;z-index:2;}
+.game-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:1px;text-shadow:0 0 20px #a78bfa;}
+.game-subtitle{font-size:14px;color:#a5b4fc;margin-top:4px;}
+
+.rocket-area{display:flex;justify-content:center;margin:8px 0;position:relative;z-index:2;}
+
+.tabs{display:flex;gap:6px;padding:0 12px 12px;justify-content:center;flex-wrap:wrap;z-index:2;position:relative;}
+.tab{padding:10px 16px;border-radius:20px;border:2px solid transparent;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;color:#c4b5fd;background:rgba(255,255,255,.08);letter-spacing:.3px;}
+.tab:hover{transform:scale(1.05);}
+.tab.active{color:#1e1b4b;border-color:transparent;transform:scale(1.05);}
+.tab.t1.active{background:#fbbf24;}
+.tab.t2.active{background:#34d399;}
+.tab.t3.active{background:#f472b6;}
+.tab.t4.active{background:#60a5fa;}
+.tab.t5.active{background:#fb923c;}
+
+.content{padding:0 12px 24px;position:relative;z-index:2;}
+.section{display:none;animation:slide-in .3s ease;}
+.section.active{display:block;}
+
+.kid-card{background:rgba(255,255,255,.95);border-radius:20px;padding:16px;margin-bottom:12px;border:3px solid transparent;}
+.kc-yellow{border-color:#fbbf24;}
+.kc-green{border-color:#34d399;}
+.kc-pink{border-color:#f472b6;}
+.kc-blue{border-color:#60a5fa;}
+
+.card-title{font-size:16px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.card-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ci-yellow{background:#fef3c7;}
+.ci-green{background:#d1fae5;}
+.ci-pink{background:#fce7f3;}
+.ci-blue{background:#dbeafe;}
+
+.term-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.term-box{border-radius:14px;padding:12px 10px;text-align:center;}
+.tb1{background:#fef3c7;border:2px solid #fbbf24;}
+.tb2{background:#d1fae5;border:2px solid #34d399;}
+.tb3{background:#fce7f3;border:2px solid #f472b6;}
+.tb4{background:#dbeafe;border:2px solid #60a5fa;}
+.term-num{font-size:22px;font-weight:900;display:block;}
+.t1n{color:#d97706;}
+.t2n{color:#059669;}
+.t3n{color:#db2777;}
+.t4n{color:#2563eb;}
+.term-name{font-size:12px;font-weight:700;color:#374151;margin-top:2px;display:block;}
+.term-example{font-size:11px;color:#6b7280;margin-top:2px;}
+
+.formula-strip{background:linear-gradient(90deg,#fbbf24,#f472b6,#60a5fa);border-radius:16px;padding:3px;}
+.formula-inner{background:#1e1b4b;border-radius:14px;padding:14px;text-align:center;}
+.formula-text{font-size:15px;font-weight:800;color:#fff;letter-spacing:.5px;}
+.formula-hl{color:#fbbf24;}
+
+.rule-box{background:linear-gradient(135deg,#fef3c7,#fce7f3);border-radius:14px;padding:12px;border:2px dashed #f472b6;text-align:center;margin-top:10px;}
+.rule-text{font-size:13px;font-weight:700;color:#1e1b4b;}
+.rule-big{font-size:16px;color:#db2777;display:block;margin-top:4px;}
+
+.vis-controls{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+.vc-group{text-align:center;}
+.vc-label{font-size:12px;color:#a5b4fc;font-weight:700;display:block;margin-bottom:4px;}
+.vc-val{font-size:20px;font-weight:900;color:#fbbf24;display:block;margin-top:4px;}
+.vc-group input[type=range]{width:120px;accent-color:#f472b6;}
+
+.apples-area{background:rgba(255,255,255,.1);border-radius:16px;padding:12px;margin-bottom:10px;}
+.apples-title{font-size:12px;color:#a5b4fc;font-weight:700;margin-bottom:8px;}
+.apples-row{display:flex;flex-wrap:wrap;gap:5px;}
+.apple{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid transparent;transition:all .3s;}
+.apple.grouped{background:#d1fae5;border-color:#34d399;}
+.apple.remainder{background:#fce7f3;border-color:#f472b6;}
+
+.baskets-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.basket{background:rgba(255,255,255,.12);border:2px solid #60a5fa;border-radius:14px;padding:8px;min-width:60px;text-align:center;}
+.basket-title{font-size:11px;color:#93c5fd;font-weight:700;margin-bottom:4px;}
+.basket-apples{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;}
+.basket-apple{font-size:16px;}
+.remain-box{background:rgba(244,114,182,.15);border:2px dashed #f472b6;border-radius:14px;padding:8px;text-align:center;}
+.remain-label{font-size:11px;color:#f9a8d4;font-weight:700;}
+.remain-apples{font-size:20px;margin-top:2px;}
+
+.result-banner{background:linear-gradient(90deg,#fbbf24,#f472b6);border-radius:14px;padding:12px;text-align:center;font-size:18px;font-weight:900;color:#1e1b4b;margin-top:8px;}
+
+.step-list{display:flex;flex-direction:column;gap:10px;}
+.step-item{background:rgba(255,255,255,.95);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start;border:3px solid transparent;transition:all .3s;}
+.step-item:hover{transform:scale(1.02);}
+.si1{border-color:#fbbf24;}
+.si2{border-color:#34d399;}
+.si3{border-color:#f472b6;}
+.si4{border-color:#60a5fa;}
+.step-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0;}
+.sn1{background:#d97706;}
+.sn2{background:#059669;}
+.sn3{background:#db2777;}
+.sn4{background:#2563eb;}
+.step-body{flex:1;}
+.step-title{font-size:15px;font-weight:800;color:#1e1b4b;margin-bottom:4px;}
+.step-desc{font-size:13px;color:#374151;line-height:1.6;}
+.step-chip{display:inline-block;padding:6px 14px;border-radius:20px;font-size:15px;font-weight:800;margin-top:6px;}
+.sc1{background:#fef3c7;color:#d97706;}
+.sc2{background:#d1fae5;color:#059669;}
+.sc3{background:#fce7f3;color:#db2777;}
+.sc4{background:#dbeafe;color:#2563eb;}
+
+.quiz-wrap{text-align:center;}
+.score-stars{display:flex;justify-content:center;gap:4px;margin-bottom:12px;}
+.star-icon{font-size:24px;transition:all .3s;}
+
+.quiz-card{background:rgba(255,255,255,.95);border-radius:20px;padding:20px 16px;margin-bottom:12px;}
+.quiz-q{font-size:22px;font-weight:900;color:#1e1b4b;margin-bottom:16px;}
+.quiz-num{font-size:36px;font-weight:900;color:#7c3aed;}
+.inputs-row{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.input-field{text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.input-field label{font-size:12px;font-weight:700;color:#6b7280;}
+.input-field input{width:68px;height:54px;border-radius:14px;border:3px solid #e5e7eb;font-size:24px;font-weight:900;text-align:center;color:#1e1b4b;background:#f9fafb;outline:none;transition:border-color .2s;}
+.input-field input:focus{border-color:#7c3aed;}
+.op-text{font-size:18px;font-weight:700;color:#6b7280;}
+
+.btn-check{width:100%;padding:14px;border-radius:16px;border:none;font-size:16px;font-weight:900;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+.btn-check:hover{transform:scale(1.03);}
+.btn-check:active{transform:scale(.97);}
+.btn-green{background:linear-gradient(135deg,#34d399,#059669);color:#fff;}
+.btn-next{background:linear-gradient(135deg,#60a5fa,#2563eb);color:#fff;margin-top:8px;}
+
+.feedback-area{min-height:54px;border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:center;margin-top:10px;font-size:15px;font-weight:800;}
+.fb-empty{background:rgba(255,255,255,.1);color:#a5b4fc;}
+.fb-correct{background:#d1fae5;color:#065f46;animation:pop .4s ease;}
+.fb-wrong{background:#fee2e2;color:#991b1b;animation:shake .4s ease;}
+
+.proof-wrap{}
+.proof-card{background:rgba(255,255,255,.95);border-radius:20px;padding:16px;margin-bottom:12px;}
+.proof-formula{background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:14px;padding:14px;text-align:center;color:#fff;font-size:15px;font-weight:700;line-height:2;margin-bottom:12px;}
+.proof-inputs{display:flex;gap:8px;align-items:flex-end;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+.pi-field{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.pi-field label{font-size:12px;font-weight:700;color:#6b7280;}
+.pi-field input{width:70px;height:48px;border-radius:12px;border:3px solid #e5e7eb;font-size:22px;font-weight:900;text-align:center;color:#1e1b4b;background:#f9fafb;outline:none;}
+.pi-field input:focus{border-color:#7c3aed;}
+.pi-op{font-size:22px;color:#6b7280;font-weight:700;padding-bottom:4px;}
+.proof-result{background:linear-gradient(135deg,#d1fae5,#a7f3d0);border-radius:14px;padding:14px;font-size:14px;font-weight:700;color:#065f46;line-height:2;text-align:center;}
+.proof-result .big{font-size:20px;color:#059669;}
+
+.confetti-piece{position:absolute;width:10px;height:10px;border-radius:2px;animation:confetti-fall 1s ease forwards;pointer-events:none;}
+
+.mascot{animation:bounce 2s ease-in-out infinite;}
+</style>
+
+<div class="wrap" id="main-wrap">
+<div class="star" style="width:3px;height:3px;top:8%;left:10%;--dur:1.8s;--del:.2s;"></div>
+<div class="star" style="width:2px;height:2px;top:15%;left:30%;--dur:2.4s;--del:.5s;"></div>
+<div class="star" style="width:4px;height:4px;top:5%;left:55%;--dur:1.5s;--del:.1s;"></div>
+<div class="star" style="width:2px;height:2px;top:20%;left:75%;--dur:3s;--del:.8s;"></div>
+<div class="star" style="width:3px;height:3px;top:12%;left:90%;--dur:2.1s;--del:.3s;"></div>
+<div class="star" style="width:2px;height:2px;top:30%;left:5%;--dur:1.9s;--del:.6s;"></div>
+<div class="star" style="width:3px;height:3px;top:40%;left:95%;--dur:2.6s;--del:.4s;"></div>
+
+<div class="header">
+  <div class="rocket-area">
+    <svg class="mascot" width="80" height="100" viewBox="0 0 80 100">
+      <ellipse cx="40" cy="55" rx="18" ry="28" fill="#7c3aed"/>
+      <path d="M22 55 Q40 5 58 55 Z" fill="#a78bfa"/>
+      <ellipse cx="40" cy="56" rx="10" ry="10" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+      <circle cx="40" cy="56" r="6" fill="#1e40af"/>
+      <circle cx="38" cy="54" r="2" fill="#93c5fd"/>
+      <path d="M22 65 L14 80 L22 75 Z" fill="#fbbf24"/>
+      <path d="M58 65 L66 80 L58 75 Z" fill="#fbbf24"/>
+      <ellipse cx="40" cy="82" rx="14" ry="6" fill="#f472b6" opacity=".7"/>
+      <ellipse cx="33" cy="84" rx="5" ry="8" fill="#fb923c"/>
+      <ellipse cx="47" cy="84" rx="5" ry="8" fill="#fb923c"/>
+      <ellipse cx="33" cy="90" rx="4" ry="5" fill="#fbbf24" opacity=".8"/>
+      <ellipse cx="47" cy="90" rx="4" ry="5" fill="#fbbf24" opacity=".8"/>
+    </svg>
+  </div>
+  <div class="game-title">مغامرة القسمة الفضائية</div>
+  <div class="game-subtitle">تعلّم مع رائد الفضاء نجم!</div>
+</div>
+
+<div class="tabs">
+  <button class="tab t1 active" onclick="showTab('intro')">المفاهيم</button>
+  <button class="tab t2" onclick="showTab('visual')">تجربة بصرية</button>
+  <button class="tab t3" onclick="showTab('steps')">خطوات الحل</button>
+  <button class="tab t4" onclick="showTab('practice')">تحدّيات</button>
+  <button class="tab t5" onclick="showTab('proof')">التحقق</button>
+</div>
+
+<div class="content">
+
+<div class="section active" id="tab-intro">
+  <div class="kid-card kc-yellow">
+    <div class="card-title" style="color:#92400e;">
+      <div class="card-icon ci-yellow">🚀</div>
+      ما هي القسمة الإقليدية؟
+    </div>
+    <div style="font-size:13px;color:#374151;line-height:1.7;">
+      القسمة تعني توزيع عدد من الأشياء على مجموعات متساوية. مثلاً: لديك <strong>47 تفاحة</strong> وتريد توزيعها على <strong>5 سلال</strong> بالتساوي!
+    </div>
+    <div class="term-grid" style="margin-top:10px;">
+      <div class="term-box tb1">
+        <span class="term-num t1n">47</span>
+        <span class="term-name">المقسوم</span>
+        <div class="term-example">عدد التفاحات</div>
+      </div>
+      <div class="term-box tb2">
+        <span class="term-num t2n">5</span>
+        <span class="term-name">المقسوم عليه</span>
+        <div class="term-example">عدد السلال</div>
+      </div>
+      <div class="term-box tb3">
+        <span class="term-num t3n">9</span>
+        <span class="term-name">الخارج</span>
+        <div class="term-example">في كل سلة</div>
+      </div>
+      <div class="term-box tb4">
+        <span class="term-num t4n">2</span>
+        <span class="term-name">الباقي</span>
+        <div class="term-example">تفاحات زائدة</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-strip">
+    <div class="formula-inner">
+      <div class="formula-text">
+        <span class="formula-hl">المقسوم</span> = (الخارج × المقسوم عليه) + <span style="color:#f472b6;">الباقي</span>
+      </div>
+      <div style="color:#a5b4fc;font-size:13px;margin-top:6px;">47 = (9 × 5) + 2 = 45 + 2 = 47 ✓</div>
+    </div>
+  </div>
+
+  <div class="rule-box" style="margin-top:10px;">
+    <div class="rule-text">القاعدة الذهبية:</div>
+    <span class="rule-big">الباقي دائماً أصغر من المقسوم عليه!</span>
+    <div style="font-size:12px;color:#374151;margin-top:6px;">إذا كان الباقي مساوياً أو أكبر ← نكمل القسمة</div>
+  </div>
+</div>
+
+<div class="section" id="tab-visual">
+  <div class="vis-controls">
+    <div class="vc-group">
+      <span class="vc-label">عدد التفاحات</span>
+      <input type="range" min="5" max="48" value="17" step="1" id="sl-d" oninput="updateVis()">
+      <span class="vc-val" id="vv-d">17</span>
+    </div>
+    <div class="vc-group">
+      <span class="vc-label">عدد السلال</span>
+      <input type="range" min="2" max="9" value="4" step="1" id="sl-v" oninput="updateVis()">
+      <span class="vc-val" id="vv-v">4</span>
+    </div>
+  </div>
+
+  <div class="kid-card kc-green" style="padding:12px;">
+    <div class="apples-area">
+      <div class="apples-title">كل التفاحات:</div>
+      <div class="apples-row" id="all-apples"></div>
+    </div>
+    <div class="apples-title" style="color:#065f46;font-weight:700;margin-bottom:6px;">التوزيع على السلال:</div>
+    <div class="baskets-row" id="baskets-row"></div>
+    <div class="remain-box" id="remain-box" style="display:none;">
+      <div class="remain-label">الباقي:</div>
+      <div class="remain-apples" id="remain-apples"></div>
+    </div>
+    <div class="result-banner" id="result-banner"></div>
+  </div>
+</div>
+
+<div class="section" id="tab-steps">
+  <div style="background:rgba(255,255,255,.1);border-radius:14px;padding:10px;text-align:center;margin-bottom:12px;">
+    <div style="font-size:13px;color:#a5b4fc;font-weight:700;">المثال المشروح:</div>
+    <div style="font-size:22px;font-weight:900;color:#fbbf24;margin-top:4px;">73 ÷ 6 = ؟</div>
+  </div>
+  <div class="step-list">
+    <div class="step-item si1" onclick="this.style.transform='scale(1.03)';setTimeout(()=>this.style.transform='',300)">
+      <div class="step-num sn1">1</div>
+      <div class="step-body">
+        <div class="step-title">اكتب العملية</div>
+        <div class="step-desc">نضع المقسوم (73) ثم خطاً رأسياً ثم المقسوم عليه (6)</div>
+        <span class="step-chip sc1">73 | 6</span>
+      </div>
+    </div>
+    <div class="step-item si2" onclick="this.style.transform='scale(1.03)';setTimeout(()=>this.style.transform='',300)">
+      <div class="step-num sn2">2</div>
+      <div class="step-body">
+        <div class="step-title">ابحث عن الخارج</div>
+        <div class="step-desc">كم مرة يدخل 6 في 73؟<br>6×10=60 ✓ &nbsp; 6×12=72 ✓ &nbsp; 6×13=78 ✗<br>الخارج = 12</div>
+        <span class="step-chip sc2">6 × 12 = 72</span>
+      </div>
+    </div>
+    <div class="step-item si3" onclick="this.style.transform='scale(1.03)';setTimeout(()=>this.style.transform='',300)">
+      <div class="step-num sn3">3</div>
+      <div class="step-body">
+        <div class="step-title">احسب الباقي</div>
+        <div class="step-desc">نطرح: 73 − 72 = 1</div>
+        <span class="step-chip sc3">الباقي = 1</span>
+      </div>
+    </div>
+    <div class="step-item si4" onclick="this.style.transform='scale(1.03)';setTimeout(()=>this.style.transform='',300)">
+      <div class="step-num sn4">4</div>
+      <div class="step-body">
+        <div class="step-title">تحقق من الباقي</div>
+        <div class="step-desc">هل الباقي (1) أصغر من المقسوم عليه (6)؟<br>1 &lt; 6 ✓ القسمة صحيحة!</div>
+        <span class="step-chip sc4" style="font-size:17px;">73 ÷ 6 = 12 باقٍ 1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="tab-practice">
+  <div class="quiz-wrap">
+    <div class="score-stars" id="score-stars">
+      <span style="font-size:14px;color:#a5b4fc;font-weight:700;">النجوم: </span>
+      <span class="star-icon" id="st1" style="color:#d1d5db;">★</span>
+      <span class="star-icon" id="st2" style="color:#d1d5db;">★</span>
+      <span class="star-icon" id="st3" style="color:#d1d5db;">★</span>
+      <span class="star-icon" id="st4" style="color:#d1d5db;">★</span>
+      <span class="star-icon" id="st5" style="color:#d1d5db;">★</span>
+      <span style="font-size:13px;color:#fbbf24;font-weight:700;" id="score-text">0 / 0</span>
+    </div>
+    <div class="quiz-card">
+      <div class="quiz-q" id="quiz-q-txt">
+        <span id="q-context" style="font-size:14px;color:#6b7280;display:block;margin-bottom:6px;"></span>
+        <span id="q-op" style="font-size:30px;color:#7c3aed;font-weight:900;"></span>
+      </div>
+      <div class="inputs-row">
+        <div class="input-field">
+          <label>الخارج</label>
+          <input type="number" id="ans-q" min="0" placeholder="؟" oninput="clearFb()">
+        </div>
+        <div class="op-text">باقٍ</div>
+        <div class="input-field">
+          <label>الباقي</label>
+          <input type="number" id="ans-r" min="0" placeholder="؟" oninput="clearFb()">
+        </div>
+      </div>
+      <button class="btn-check btn-green" onclick="checkAnswer()">تحقق من إجابتي!</button>
+      <button class="btn-check btn-next" onclick="nextQ()">سؤال آخر</button>
+      <div class="feedback-area fb-empty" id="feedback">أدخل الخارج والباقي ثم اضغط تحقق</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="tab-proof">
+  <div class="proof-card">
+    <div class="proof-formula">
+      المقسوم = (الخارج × المقسوم عليه) + الباقي<br>
+      <span style="color:#fbbf24;">73 = (12 × 6) + 1 = 72 + 1 = 73 ✓</span>
+    </div>
+    <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px;text-align:center;">جرّب أرقامك الخاصة:</div>
+    <div class="proof-inputs">
+      <div class="pi-field">
+        <label>المقسوم</label>
+        <input type="number" id="pr-d" value="47" min="1" oninput="updateProof()">
+      </div>
+      <div class="pi-op">÷</div>
+      <div class="pi-field">
+        <label>المقسوم عليه</label>
+        <input type="number" id="pr-v" value="5" min="1" oninput="updateProof()">
+      </div>
+    </div>
+    <div class="proof-result" id="proof-out"></div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+const EMOJIS=['🍎','🍊','⭐','🎯','🍇','🍓','🌟','🏆'];
+let curEmoji='🍎';
+
+const questions=[
+  {a:27,b:4,ctx:'وزّع 27 كرةً على 4 أطفال بالتساوي'},
+  {a:38,b:5,ctx:'38 بيضةً في صناديق تتسع 5 بيضات'},
+  {a:53,b:7,ctx:'53 زهرةً في 7 مزهريات'},
+  {a:65,b:8,ctx:'65 تمرةً على 8 أطباق'},
+  {a:41,b:6,ctx:'وزّع 41 قلماً على 6 طلاب'},
+  {a:84,b:9,ctx:'84 كتاباً على 9 أرفف'},
+  {a:29,b:3,ctx:'29 تفاحةً في 3 سلال'},
+  {a:76,b:8,ctx:'76 حبّةً في 8 أكياس'},
+  {a:55,b:6,ctx:'55 عصاً لـ 6 مجموعات'},
+  {a:93,b:10,ctx:'93 نقطةً على 10 لاعبين'}
+];
+let qIdx=0,score=0,total=0;
+
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const map={intro:'t1',visual:'t2',steps:'t3',practice:'t4',proof:'t5'};
+  document.querySelectorAll('.tab').forEach(t=>{
+    if(t.classList.contains(map[id]))t.classList.add('active');
+  });
+}
+
+function updateVis(){
+  const d=parseInt(document.getElementById('sl-d').value);
+  const v=parseInt(document.getElementById('sl-v').value);
+  document.getElementById('vv-d').textContent=d;
+  document.getElementById('vv-v').textContent=v;
+  const q=Math.floor(d/v),r=d%v;
+  const allA=document.getElementById('all-apples');
+  allA.innerHTML='';
+  for(let i=0;i<d;i++){
+    const a=document.createElement('div');
+    a.className='apple '+(i<d-r?'grouped':'remainder');
+    a.textContent='🍎';
+    allA.appendChild(a);
+  }
+  const br=document.getElementById('baskets-row');
+  br.innerHTML='';
+  for(let g=0;g<q;g++){
+    const box=document.createElement('div');
+    box.className='basket';
+    box.innerHTML='<div class="basket-title">سلة '+(g+1)+'</div><div class="basket-apples">';
+    for(let i=0;i<v;i++) box.querySelector('.basket-apples').innerHTML+='<span class="basket-apple">🍎</span>';
+    box.innerHTML+='</div>';
+    br.appendChild(box);
+  }
+  const rb=document.getElementById('remain-box');
+  if(r>0){
+    rb.style.display='block';
+    document.getElementById('remain-apples').textContent='🍎'.repeat(r);
+  } else rb.style.display='none';
+  document.getElementById('result-banner').textContent=d+' ÷ '+v+' = '+q+(r>0?' باقٍ '+r:' (قسمة تامة)');
+}
+updateVis();
+
+function loadQ(){
+  const q=questions[qIdx];
+  document.getElementById('q-context').textContent=q.ctx;
+  document.getElementById('q-op').textContent=q.a+' ÷ '+q.b+' = ؟';
+  document.getElementById('ans-q').value='';
+  document.getElementById('ans-r').value='';
+  document.getElementById('feedback').className='feedback-area fb-empty';
+  document.getElementById('feedback').textContent='أدخل الخارج والباقي ثم اضغط تحقق';
+}
+loadQ();
+
+function clearFb(){
+  const fb=document.getElementById('feedback');
+  fb.className='feedback-area fb-empty';
+  fb.textContent='أدخل الخارج والباقي ثم اضغط تحقق';
+}
+
+function checkAnswer(){
+  const q=questions[qIdx];
+  const aq=parseInt(document.getElementById('ans-q').value);
+  const ar=parseInt(document.getElementById('ans-r').value);
+  if(isNaN(aq)||isNaN(ar)){
+    const fb=document.getElementById('feedback');
+    fb.className='feedback-area fb-empty';
+    fb.textContent='أكمل الإجابة أولاً!';
+    return;
+  }
+  const cq=Math.floor(q.a/q.b),cr=q.a%q.b;
+  total++;
+  const fb=document.getElementById('feedback');
+  if(aq===cq&&ar===cr){
+    score++;
+    fb.className='feedback-area fb-correct';
+    fb.textContent='رائع يا بطل! '+q.a+' ÷ '+q.b+' = '+cq+' باقٍ '+cr;
+    spawnConfetti();
+  } else {
+    fb.className='feedback-area fb-wrong';
+    fb.textContent='حاول مجدداً! الصحيح: '+cq+' باقٍ '+cr;
+  }
+  updateStars();
+}
+
+function updateStars(){
+  document.getElementById('score-text').textContent=score+' / '+total;
+  for(let i=1;i<=5;i++){
+    const s=document.getElementById('st'+i);
+    s.style.color=i<=score?'#fbbf24':'#d1d5db';
+    if(i===score) s.style.animation='pop .4s ease';
+  }
+}
+
+function nextQ(){
+  qIdx=(qIdx+1)%questions.length;
+  loadQ();
+}
+
+function updateProof(){
+  const d=parseInt(document.getElementById('pr-d').value)||0;
+  const v=parseInt(document.getElementById('pr-v').value)||1;
+  if(v<1)return;
+  const q=Math.floor(d/v),r=d%v;
+  const check=q*v+r;
+  const ok=check===d;
+  document.getElementById('proof-out').innerHTML=
+    d+' ÷ '+v+' = <span class="big">'+q+'</span> باقٍ <span class="big">'+r+'</span><br>'+
+    'التحقق: ('+q+' × '+v+') + '+r+' = '+(q*v)+' + '+r+' = <span class="big">'+check+'</span> '+(ok?'✓ صحيح!':'✗');
+}
+updateProof();
+
+function spawnConfetti(){
+  const colors=['#fbbf24','#34d399','#f472b6','#60a5fa','#fb923c','#a78bfa'];
+  const wrap=document.getElementById('main-wrap');
+  for(let i=0;i<18;i++){
+    const c=document.createElement('div');
+    c.className='confetti-piece';
+    c.style.left=Math.random()*100+'%';
+    c.style.top='-10px';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.transform='rotate('+Math.random()*360+'deg)';
+    c.style.animationDelay=(Math.random()*.4)+'s';
+    c.style.animationDuration=(.7+Math.random()*.5)+'s';
+    wrap.appendChild(c);
+    setTimeout(()=>c.remove(),1200);
+  }
+}
+</script>
