@@ -1,0 +1,442 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { direction: rtl; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+  .lesson { padding: 1rem; max-width: 680px; }
+  .section { margin-bottom: 1.5rem; border-radius: 16px; overflow: hidden; }
+  .sec-head { padding: 14px 18px; font-size: 17px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+  .sec-body { padding: 16px 18px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-top: none; border-radius: 0 0 16px 16px; }
+  .badge { display: inline-block; font-size: 13px; padding: 3px 10px; border-radius: 20px; font-weight: 500; margin-bottom: 6px; }
+  .comp-card { border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; border: 0.5px solid transparent; }
+  .blue-card { background: #E6F1FB; border-color: #85B7EB; }
+  .green-card { background: #EAF3DE; border-color: #97C459; }
+  .orange-card { background: #FAEEDA; border-color: #EF9F27; }
+  .purple-card { background: #EEEDFE; border-color: #AFA9EC; }
+  .comp-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .blue-text { color: #0C447C; }
+  .green-text { color: #27500A; }
+  .orange-text { color: #633806; }
+  .purple-text { color: #3C3489; }
+  .comp-desc { font-size: 14px; line-height: 1.7; color: var(--color-text-secondary); }
+  .comp-example { font-size: 13px; margin-top: 6px; padding: 6px 10px; border-radius: 8px; }
+  .blue-ex { background: #B5D4F4; color: #042C53; }
+  .green-ex { background: #C0DD97; color: #173404; }
+  .orange-ex { background: #FAC775; color: #412402; }
+  .purple-ex { background: #CECBF6; color: #26215C; }
+  .vis-icon { width: 60px; height: 60px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; float: left; margin: 0 0 8px 12px; }
+  .blue-icon { background: #B5D4F4; }
+  .green-icon { background: #C0DD97; }
+  .orange-icon { background: #FAC775; }
+  .purple-icon { background: #CECBF6; }
+  .q-btn { display: block; width: 100%; text-align: right; padding: 10px 14px; margin-bottom: 8px; border-radius: 10px; border: 1.5px solid var(--color-border-secondary); background: var(--color-background-secondary); cursor: pointer; font-size: 14px; color: var(--color-text-primary); font-family: inherit; transition: background 0.15s; }
+  .q-btn:hover { background: var(--color-background-tertiary); }
+  .q-btn.correct { background: #EAF3DE; border-color: #639922; color: #173404; }
+  .q-btn.wrong { background: #FCEBEB; border-color: #E24B4A; color: #501313; }
+  .q-feedback { padding: 10px 14px; border-radius: 10px; font-size: 14px; margin-top: 6px; display: none; }
+  .q-feedback.show { display: block; }
+  .feedback-ok { background: #EAF3DE; color: #27500A; }
+  .feedback-try { background: #FAEEDA; color: #633806; }
+  .match-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .match-label { font-size: 14px; padding: 8px 12px; border-radius: 10px; font-weight: 500; min-width: 120px; text-align: center; }
+  .match-select { flex: 1; min-width: 150px; font-size: 14px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); font-family: inherit; cursor: pointer; }
+  .match-result { font-size: 13px; padding: 4px 10px; border-radius: 8px; }
+  .check-btn { padding: 10px 24px; border-radius: 12px; background: #378ADD; color: #E6F1FB; border: none; font-size: 15px; font-weight: 500; cursor: pointer; font-family: inherit; margin-top: 10px; }
+  .check-btn:hover { background: #185FA5; }
+  .check-btn.green-btn { background: #639922; color: #EAF3DE; }
+  .check-btn.green-btn:hover { background: #3B6D11; }
+  .check-btn.orange-btn { background: #BA7517; color: #FAEEDA; }
+  .stars { font-size: 22px; letter-spacing: 2px; }
+  .teacher-q { background: var(--color-background-secondary); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; border-right: 4px solid #7F77DD; font-size: 14px; line-height: 1.7; }
+  .encouragement { border-radius: 14px; padding: 14px 18px; text-align: center; font-size: 15px; line-height: 1.8; }
+  .enc1 { background: #EEEDFE; color: #3C3489; border: 0.5px solid #AFA9EC; }
+  .enc2 { background: #EAF3DE; color: #27500A; border: 0.5px solid #97C459; }
+  .enc3 { background: #FAEEDA; color: #633806; border: 0.5px solid #EF9F27; }
+  .score-box { background: var(--color-background-secondary); border-radius: 14px; padding: 14px; text-align: center; margin-top: 12px; display: none; }
+  .score-box.show { display: block; }
+  .score-num { font-size: 36px; font-weight: 500; color: #639922; }
+  .section-title-blue { background: #378ADD; color: #E6F1FB; }
+  .section-title-green { background: #639922; color: #EAF3DE; }
+  .section-title-orange { background: #BA7517; color: #FAEEDA; }
+  .section-title-purple { background: #7F77DD; color: #EEEDFE; }
+  .section-title-teal { background: #1D9E75; color: #E1F5EE; }
+  .section-title-pink { background: #D4537E; color: #FBEAF0; }
+  .section-title-coral { background: #D85A30; color: #FAECE7; }
+  .story-box { background: #FAEEDA; border-radius: 12px; padding: 16px; border-right: 4px solid #EF9F27; font-size: 14px; line-height: 1.9; color: #412402; }
+  .activity-label { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 10px; }
+  .choose-btn { display: inline-block; padding: 8px 16px; margin: 4px; border-radius: 10px; border: 1.5px solid var(--color-border-secondary); background: var(--color-background-secondary); cursor: pointer; font-size: 14px; color: var(--color-text-primary); font-family: inherit; }
+  .choose-btn:hover { background: var(--color-background-tertiary); }
+  .choose-btn.sel-correct { background: #EAF3DE; border-color: #639922; color: #173404; }
+  .choose-btn.sel-wrong { background: #FCEBEB; border-color: #E24B4A; color: #501313; }
+  .step-indicator { display: flex; gap: 6px; margin-bottom: 12px; }
+  .step-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--color-border-secondary); }
+  .step-dot.active { background: #378ADD; }
+  .quiz-q { margin-bottom: 18px; padding: 14px; border-radius: 12px; background: var(--color-background-secondary); }
+  .quiz-q-text { font-size: 15px; font-weight: 500; margin-bottom: 10px; color: var(--color-text-primary); }
+  .practical-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px; background: var(--color-background-secondary); border-radius: 10px; margin-bottom: 8px; font-size: 14px; line-height: 1.6; }
+  .practical-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; background: #CECBF6; color: #26215C; }
+  hr { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 14px 0; }
+</style>
+
+<div class="lesson" dir="rtl">
+
+<div style="text-align:center; padding: 20px 0 10px;">
+  <div style="font-size: 32px; margin-bottom: 6px;">🖥️</div>
+  <div style="font-size: 22px; font-weight: 500; color: var(--color-text-primary);">مكوّنات الحاسوب</div>
+  <div style="font-size: 14px; color: var(--color-text-secondary); margin-top: 4px;">للمرحلة الابتدائية • الفئة العمرية 6–8 سنوات</div>
+  <div style="display:flex; justify-content:center; gap:8px; margin-top:12px; flex-wrap:wrap;">
+    <span class="badge" style="background:#B5D4F4;color:#042C53;">🖥️ الشاشة</span>
+    <span class="badge" style="background:#C0DD97;color:#173404;">🖱️ الفأرة</span>
+    <span class="badge" style="background:#FAC775;color:#412402;">⌨️ لوحة المفاتيح</span>
+    <span class="badge" style="background:#CECBF6;color:#26215C;">🖧 الوحدة المركزية</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-orange">🎬 مقدمة — قصة سامي والحاسوب</div>
+  <div class="sec-body">
+    <div class="story-box">
+      كان سامي في المنزل ذات يوم، أراد أن يرسم صورة جميلة ويرسل تحياته لجدّته البعيدة.<br><br>
+      نظر أمامه فوجد <strong style="color:#0C447C;">الشاشة</strong> تضيء كالسحر وتُريه كل شيء بألوان زاهية ✨<br>
+      أمسك <strong style="color:#27500A;">الفأرة</strong> الصغيرة وتحرّك السهم على الشاشة كأنه يمشي! 🖱️<br>
+      ثم وضع أصابعه على <strong style="color:#BA7517;">لوحة المفاتيح</strong> وكتب "أحبك يا جدّة" حرفًا حرفًا ⌨️<br>
+      وكل هذا لأن هناك صندوقًا ذكيًا اسمه <strong style="color:#3C3489;">الوحدة المركزية</strong> يعمل في صمت ويفكّر بدلاً عنه! 🧠<br><br>
+      <em>هل تريد أن تتعرّف على أصدقاء سامي؟ هيّا بنا!</em>
+    </div>
+    <div style="margin-top:12px; padding:10px 14px; background:#E6F1FB; border-radius:10px; font-size:14px; color:#042C53;">
+      <strong>سؤال للمعلّم:</strong> ماذا يفعل سامي مع الحاسوب؟ هل استخدمت الحاسوب من قبل؟
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-blue">📚 تعرّف على المكوّنات</div>
+  <div class="sec-body">
+
+    <div class="comp-card blue-card">
+      <div class="vis-icon blue-icon">🖥️</div>
+      <div class="comp-title blue-text">الشاشة <span class="badge" style="background:#378ADD;color:#E6F1FB;font-size:11px;">أزرق</span></div>
+      <div class="comp-desc">الشاشة هي نافذة الحاسوب. تُريك الصور والكتابة والألعاب. بدونها لا ترى شيئًا!</div>
+      <div class="comp-example blue-ex">مثال: تشبه التلفاز في بيتك، لكنها تُظهر ما تطلبه أنت!</div>
+      <div style="clear:both;"></div>
+    </div>
+
+    <div class="comp-card green-card">
+      <div class="vis-icon green-icon">🖱️</div>
+      <div class="comp-title green-text">الفأرة <span class="badge" style="background:#639922;color:#EAF3DE;font-size:11px;">أخضر</span></div>
+      <div class="comp-desc">الفأرة أداة صغيرة تُمسكها بيدك. حين تحرّكها يتحرّك السهم على الشاشة. يمكنك النقر عليها لفتح الأشياء!</div>
+      <div class="comp-example green-ex">مثال: تشبه الإصبع الذي تشير به إلى ما تريد!</div>
+      <div style="clear:both;"></div>
+    </div>
+
+    <div class="comp-card orange-card">
+      <div class="vis-icon orange-icon">⌨️</div>
+      <div class="comp-title orange-text">لوحة المفاتيح <span class="badge" style="background:#BA7517;color:#FAEEDA;font-size:11px;">برتقالي</span></div>
+      <div class="comp-desc">لوحة المفاتيح مليئة بالأحرف والأرقام. تضغط عليها فتظهر الكلمات على الشاشة. بها نكتب ونلعب!</div>
+      <div class="comp-example orange-ex">مثال: تشبه ألواح الكتابة في المدرسة، لكنها أسرع بكثير!</div>
+      <div style="clear:both;"></div>
+    </div>
+
+    <div class="comp-card purple-card">
+      <div class="vis-icon purple-icon">🖧</div>
+      <div class="comp-title purple-text">الوحدة المركزية <span class="badge" style="background:#7F77DD;color:#EEEDFE;font-size:11px;">بنفسجي</span></div>
+      <div class="comp-desc">هي الصندوق الكبير المجاور للشاشة. إنها دماغ الحاسوب! تستقبل الأوامر وتعالجها وتأمر بقية المكوّنات.</div>
+      <div class="comp-example purple-ex">مثال: تشبه دماغك الذي يُفكّر ويُصدر الأوامر لجسمك!</div>
+      <div style="clear:both;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-green">🎮 نشاط 1 — اختيار من متعدد</div>
+  <div class="sec-body">
+    <div id="mcq-container"></div>
+    <div class="score-box" id="mcq-score">
+      <div class="stars" id="mcq-stars"></div>
+      <div style="font-size:15px;color:var(--color-text-secondary);margin-top:6px;" id="mcq-msg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-purple">🔗 نشاط 2 — طابق المكوّن بوظيفته</div>
+  <div class="sec-body">
+    <div class="activity-label">اختر الوظيفة المناسبة لكل مكوّن:</div>
+    <div id="match-container"></div>
+    <button class="check-btn" onclick="checkMatch()">تحقّق من الإجابات ✔</button>
+    <div id="match-feedback" style="margin-top:10px;font-size:14px;display:none;"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-coral">✅ نشاط 3 — اختر الصحيح</div>
+  <div class="sec-body">
+    <div class="activity-label">انقر على الصورة الصحيحة لكل سؤال:</div>
+    <div id="choose-container"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-teal">🗣️ أسئلة المعلّم — حفّز مشاركة التلاميذ</div>
+  <div class="sec-body">
+    <div class="teacher-q">ما الذي يحدث لو أزلنا الشاشة من الحاسوب؟ هل يمكننا استخدامه؟</div>
+    <div class="teacher-q">من منكم رأى فأرة الحاسوب؟ صفوا لنا شكلها!</div>
+    <div class="teacher-q">لماذا سُمّيت الوحدة المركزية بـ"دماغ الحاسوب" في رأيكم؟</div>
+    <div class="teacher-q">ما الفرق بين لوحة المفاتيح والفأرة؟ متى نستخدم كل واحدة؟</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-blue">🧪 تطبيق عملي — أنا محقّق!</div>
+  <div class="sec-body">
+    <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:12px;">أشر إلى كل مكوّن وتحقّق من نفسك:</div>
+    <div class="practical-item"><div class="practical-num">1</div><div>انظر إلى حاسوب في الصفّ أو في بيتك — حدّد <strong style="color:#0C447C;">الشاشة</strong> بإصبعك وقل: "هذه هي الشاشة، وهي تُريني..."</div></div>
+    <div class="practical-item"><div class="practical-num">2</div><div>اعثر على <strong style="color:#27500A;">الفأرة</strong> وحرّكها — ماذا يحدث للسهم على الشاشة؟</div></div>
+    <div class="practical-item"><div class="practical-num">3</div><div>اضغط حرفًا واحدًا على <strong style="color:#BA7517;">لوحة المفاتيح</strong> — أي حرف ظهر؟</div></div>
+    <div class="practical-item"><div class="practical-num">4</div><div>أشر إلى <strong style="color:#3C3489;">الوحدة المركزية</strong> وقل لصديقك: "هذا هو دماغ الحاسوب لأنه..."</div></div>
+    <div style="margin-top:12px;padding:10px 14px;background:#EAF3DE;border-radius:10px;font-size:13px;color:#173404;">
+      إذا لم يكن حاسوب حقيقي في الصف، يُمكن استخدام صورة تعليمية ملصقة على السبورة.
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-pink">📝 اختبار قصير</div>
+  <div class="sec-body">
+    <div id="quiz-container"></div>
+    <button class="check-btn orange-btn" id="quiz-submit-btn" onclick="submitQuiz()">أرسل الإجابات 📩</button>
+    <div class="score-box" id="quiz-score">
+      <div class="score-num" id="quiz-num"></div>
+      <div class="stars" id="quiz-stars"></div>
+      <div style="font-size:15px;color:var(--color-text-secondary);margin-top:6px;" id="quiz-msg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-head section-title-purple">🎁 كلمات التشجيع</div>
+  <div class="sec-body">
+    <div class="encouragement enc1" style="margin-bottom:10px;">
+      أنت عبقري صغير! تعلّمت اليوم أسرار الحاسوب التي لا يعرفها كثيرون 🌟
+    </div>
+    <div class="encouragement enc2" style="margin-bottom:10px;">
+      كل مرة تفتح الحاسوب، تذكّر أن أصابعك هي المفتاح للعالم الرقمي الواسع 💚
+    </div>
+    <div class="encouragement enc3">
+      أحسنت! استمر في التعلّم والاستكشاف — المعرفة هي أجمل هديّة تمنحها لنفسك 🎉
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const mcqData = [
+  { q: "ما الذي يُريك الصور والكلمات على الحاسوب؟", opts: ["الفأرة", "الشاشة", "لوحة المفاتيح", "الوحدة المركزية"], ans: 1, color: "#B5D4F4", textColor: "#042C53" },
+  { q: "ماذا تستخدم لتحريك السهم على الشاشة؟", opts: ["لوحة المفاتيح", "الشاشة", "الفأرة", "الوحدة المركزية"], ans: 2, color: "#C0DD97", textColor: "#173404" },
+  { q: "أيّ مكوّن يُسمّى دماغ الحاسوب؟", opts: ["الشاشة", "لوحة المفاتيح", "الفأرة", "الوحدة المركزية"], ans: 3, color: "#CECBF6", textColor: "#26215C" },
+];
+let mcqAnswered = [false, false, false];
+let mcqCorrect = 0;
+
+function buildMCQ() {
+  const c = document.getElementById('mcq-container');
+  mcqData.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'margin-bottom:16px;padding:14px;border-radius:12px;background:var(--color-background-secondary);';
+    div.innerHTML = `<div style="font-size:15px;font-weight:500;margin-bottom:10px;color:var(--color-text-primary);">${qi+1}. ${q.q}</div>`;
+    q.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'q-btn';
+      btn.textContent = opt;
+      btn.onclick = () => {
+        if (mcqAnswered[qi]) return;
+        mcqAnswered[qi] = true;
+        div.querySelectorAll('.q-btn').forEach(b => b.disabled = true);
+        if (oi === q.ans) {
+          btn.classList.add('correct');
+          mcqCorrect++;
+          showFeedback(div, true);
+        } else {
+          btn.classList.add('wrong');
+          div.querySelectorAll('.q-btn')[q.ans].classList.add('correct');
+          showFeedback(div, false);
+        }
+        if (mcqAnswered.every(Boolean)) showMCQScore();
+      };
+      div.appendChild(btn);
+    });
+    const fb = document.createElement('div');
+    fb.className = 'q-feedback';
+    div.appendChild(fb);
+    c.appendChild(div);
+  });
+}
+
+function showFeedback(div, ok) {
+  const fb = div.querySelector('.q-feedback');
+  fb.classList.add('show');
+  fb.className = 'q-feedback show ' + (ok ? 'feedback-ok' : 'feedback-try');
+  fb.textContent = ok ? '✅ ممتاز! إجابة صحيحة!' : '❌ حاول مرة أخرى في المرة القادمة! الإجابة الصحيحة مُميَّزة باللون الأخضر.';
+}
+
+function showMCQScore() {
+  const s = document.getElementById('mcq-score');
+  s.classList.add('show');
+  const stars = mcqCorrect === 3 ? '⭐⭐⭐' : mcqCorrect === 2 ? '⭐⭐' : '⭐';
+  document.getElementById('mcq-stars').textContent = stars;
+  document.getElementById('mcq-msg').textContent = mcqCorrect === 3 ? 'رائع! أجبت على كل الأسئلة بشكل صحيح!' : mcqCorrect === 2 ? 'جيد جدًا! تقريبًا وصلت!' : 'لا بأس، الممارسة تصنع المعجزات!';
+}
+
+const matchData = [
+  { comp: "🖥️ الشاشة", color: "#B5D4F4", textColor: "#042C53", ans: "تُريك الصور والكلمات" },
+  { comp: "🖱️ الفأرة", color: "#C0DD97", textColor: "#173404", ans: "تُحرّك السهم وتنقر" },
+  { comp: "⌨️ لوحة المفاتيح", color: "#FAC775", textColor: "#412402", ans: "تكتب بها الحروف والأرقام" },
+  { comp: "🖧 الوحدة المركزية", color: "#CECBF6", textColor: "#26215C", ans: "تُفكّر وتُعالج الأوامر" },
+];
+const matchOpts = ["تُريك الصور والكلمات", "تُحرّك السهم وتنقر", "تكتب بها الحروف والأرقام", "تُفكّر وتُعالج الأوامر", "تُشغّل موسيقى"];
+
+function buildMatch() {
+  const c = document.getElementById('match-container');
+  matchData.forEach((m, i) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    row.innerHTML = `<div class="match-label" style="background:${m.color};color:${m.textColor};">${m.comp}</div>`;
+    const sel = document.createElement('select');
+    sel.className = 'match-select';
+    sel.id = 'match-' + i;
+    sel.innerHTML = '<option value="">— اختر الوظيفة —</option>' + matchOpts.map(o => `<option value="${o}">${o}</option>`).join('');
+    row.appendChild(sel);
+    const res = document.createElement('span');
+    res.className = 'match-result';
+    res.id = 'match-res-' + i;
+    row.appendChild(res);
+    c.appendChild(row);
+  });
+}
+
+function checkMatch() {
+  let correct = 0;
+  matchData.forEach((m, i) => {
+    const sel = document.getElementById('match-' + i);
+    const res = document.getElementById('match-res-' + i);
+    if (sel.value === m.ans) {
+      res.textContent = '✅';
+      res.style.color = '#27500A';
+      correct++;
+    } else {
+      res.textContent = '❌';
+      res.style.color = '#A32D2D';
+    }
+  });
+  const fb = document.getElementById('match-feedback');
+  fb.style.display = 'block';
+  fb.style.cssText = 'margin-top:10px;font-size:14px;padding:10px 14px;border-radius:10px;display:block;';
+  if (correct === 4) {
+    fb.style.background = '#EAF3DE'; fb.style.color = '#27500A';
+    fb.textContent = '🎉 رائع! ربطت كل المكوّنات بوظائفها بشكل صحيح!';
+  } else {
+    fb.style.background = '#FAEEDA'; fb.style.color = '#633806';
+    fb.textContent = `أصبت في ${correct} من 4. راجع الإجابات الخاطئة وحاول مجدّدًا!`;
+  }
+}
+
+const chooseData = [
+  { q: "أيّ مكوّن نستخدم للكتابة؟", opts: ["🖥️ الشاشة", "⌨️ لوحة المفاتيح", "🖱️ الفأرة"], ans: 1 },
+  { q: "ماذا نُسمّي الصندوق الذي يُعدّ دماغ الحاسوب؟", opts: ["🖧 الوحدة المركزية", "🖥️ الشاشة", "⌨️ لوحة المفاتيح"], ans: 0 },
+  { q: "ما المكوّن الذي نُحرّكه بيدنا لنُحرّك السهم؟", opts: ["⌨️ لوحة المفاتيح", "🖥️ الشاشة", "🖱️ الفأرة"], ans: 2 },
+];
+
+function buildChoose() {
+  const c = document.getElementById('choose-container');
+  chooseData.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'margin-bottom:14px;padding:14px;border-radius:12px;background:var(--color-background-secondary);';
+    div.innerHTML = `<div style="font-size:15px;font-weight:500;margin-bottom:10px;color:var(--color-text-primary);">${qi+1}. ${q.q}</div>`;
+    const answered = [false];
+    q.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'choose-btn';
+      btn.textContent = opt;
+      btn.onclick = () => {
+        if (answered[0]) return;
+        answered[0] = true;
+        div.querySelectorAll('.choose-btn').forEach(b => b.disabled = true);
+        btn.classList.add(oi === q.ans ? 'sel-correct' : 'sel-wrong');
+        if (oi !== q.ans) div.querySelectorAll('.choose-btn')[q.ans].classList.add('sel-correct');
+        const fb = document.createElement('div');
+        fb.style.cssText = 'margin-top:8px;font-size:13px;padding:8px 12px;border-radius:8px;';
+        fb.style.background = oi === q.ans ? '#EAF3DE' : '#FAEEDA';
+        fb.style.color = oi === q.ans ? '#27500A' : '#633806';
+        fb.textContent = oi === q.ans ? '✅ أحسنت! إجابة صحيحة!' : '❌ ليست هذه! الإجابة الصحيحة مُميَّزة.';
+        div.appendChild(fb);
+      };
+      div.appendChild(btn);
+    });
+    c.appendChild(div);
+  });
+}
+
+const quizData = [
+  { q: "1. ما الاسم الصحيح للصندوق الذي يُفكّر ويُعالج الأوامر في الحاسوب؟", opts: ["الشاشة", "الوحدة المركزية", "الفأرة", "لوحة المفاتيح"], ans: 1 },
+  { q: "2. صحيح أم خطأ: الفأرة تُستخدم لكتابة الحروف على الشاشة.", opts: ["صحيح", "خطأ"], ans: 1 },
+  { q: "3. أيّ مكوّن يُشبه الدماغ البشري في وظيفته؟", opts: ["الشاشة", "لوحة المفاتيح", "الوحدة المركزية", "الفأرة"], ans: 2 },
+  { q: "4. ماذا يحدث عند تحريك الفأرة؟", opts: ["تُطفأ الشاشة", "يتحرّك السهم على الشاشة", "تُكتب حروف", "يرتفع صوت الحاسوب"], ans: 1 },
+  { q: "5. ما عدد المكوّنات الأساسية التي تعلّمناها اليوم؟", opts: ["2", "3", "4", "5"], ans: 2 },
+];
+
+function buildQuiz() {
+  const c = document.getElementById('quiz-container');
+  quizData.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    div.innerHTML = `<div class="quiz-q-text">${q.q}</div>`;
+    q.opts.forEach((opt, oi) => {
+      const label = document.createElement('label');
+      label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;font-size:14px;color:var(--color-text-primary);';
+      label.innerHTML = `<input type="radio" name="quiz-${qi}" value="${oi}" style="accent-color:#7F77DD;width:16px;height:16px;"> ${opt}`;
+      div.appendChild(label);
+    });
+    c.appendChild(div);
+  });
+}
+
+function submitQuiz() {
+  let correct = 0;
+  quizData.forEach((q, qi) => {
+    const sel = document.querySelector(`input[name="quiz-${qi}"]:checked`);
+    if (sel && parseInt(sel.value) === q.ans) correct++;
+  });
+  document.getElementById('quiz-submit-btn').style.display = 'none';
+  const s = document.getElementById('quiz-score');
+  s.classList.add('show');
+  document.getElementById('quiz-num').textContent = correct + ' / ' + quizData.length;
+  const stars = correct >= 4 ? '⭐⭐⭐' : correct >= 2 ? '⭐⭐' : '⭐';
+  document.getElementById('quiz-stars').textContent = stars;
+  let msg = correct === 5 ? '🏆 ممتاز! درجة كاملة! أنت نجم الفصل اليوم!' :
+            correct >= 3 ? '👏 جيد جدًا! تقريبًا تتقنت الدرس!' :
+            '💪 لا بأس! راجع الدرس مجدّدًا وستنجح!';
+  document.getElementById('quiz-msg').textContent = msg;
+
+  quizData.forEach((q, qi) => {
+    const container = document.querySelectorAll('.quiz-q')[qi];
+    const labels = container.querySelectorAll('label');
+    labels.forEach((lbl, oi) => {
+      lbl.querySelector('input').disabled = true;
+      if (oi === q.ans) lbl.style.color = '#27500A';
+    });
+    const selected = container.querySelector('input:checked');
+    if (selected) {
+      const selVal = parseInt(selected.value);
+      if (selVal !== q.ans) {
+        labels[selVal].style.color = '#A32D2D';
+        labels[selVal].style.textDecoration = 'line-through';
+      }
+    }
+  });
+}
+
+buildMCQ();
+buildMatch();
+buildChoose();
+buildQuiz();
+</script>

@@ -1,0 +1,395 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; }
+  #game { direction: rtl; min-height: 600px; padding: 1rem; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* HOME */
+  #home { text-align: center; padding: 2rem 1rem; }
+  #home h1 { font-size: 28px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  #home p { font-size: 15px; color: var(--color-text-secondary); margin-bottom: 24px; line-height: 1.7; }
+  .story-box { background: #E6F1FB; border-radius: 16px; padding: 1.25rem 1.5rem; margin: 0 auto 2rem; max-width: 520px; color: #0C447C; font-size: 15px; line-height: 1.8; }
+  .story-box .char { font-size: 48px; display: block; margin-bottom: 8px; }
+  .start-btn { background: #378ADD; color: white; border: none; border-radius: 14px; padding: 14px 40px; font-size: 18px; cursor: pointer; font-weight: 500; letter-spacing: 0.5px; }
+  .start-btn:hover { background: #185FA5; }
+
+  /* STAGE BAR */
+  .stage-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .stage-dot { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #888; background: #f5f5f5; }
+  .stage-dot.done { background: #639922; border-color: #639922; color: white; }
+  .stage-dot.active { border-color: #378ADD; color: #185FA5; background: #E6F1FB; }
+
+  /* SCORE */
+  .score-bar { display: flex; justify-content: space-between; align-items: center; background: var(--color-background-secondary); border-radius: 12px; padding: 10px 16px; margin-bottom: 1.25rem; }
+  .score-label { font-size: 13px; color: var(--color-text-secondary); }
+  .stars-display { font-size: 20px; letter-spacing: 2px; }
+  .score-num { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+
+  /* STAGE HEADER */
+  .stage-header { border-radius: 16px; padding: 1rem 1.5rem; margin-bottom: 1.25rem; text-align: center; }
+  .stage-header.blue { background: #E6F1FB; }
+  .stage-header.green { background: #EAF3DE; }
+  .stage-header.orange { background: #FAEEDA; }
+  .stage-header.purple { background: #EEEDFE; }
+  .stage-icon { font-size: 44px; margin-bottom: 4px; }
+  .stage-title { font-size: 20px; font-weight: 500; }
+  .stage-title.blue { color: #0C447C; }
+  .stage-title.green { color: #27500A; }
+  .stage-title.orange { color: #633806; }
+  .stage-title.purple { color: #3C3489; }
+  .stage-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+
+  /* TASKS */
+  .task-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
+  .task-q { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 12px; line-height: 1.7; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .opt-btn { border: 2px solid var(--color-border-secondary); border-radius: 12px; padding: 12px 8px; background: var(--color-background-primary); cursor: pointer; font-size: 14px; font-weight: 500; color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; transition: border-color 0.2s; }
+  .opt-btn:hover { border-color: #378ADD; background: #E6F1FB; }
+  .opt-btn.correct { border-color: #639922; background: #EAF3DE; color: #27500A; }
+  .opt-btn.wrong { border-color: #E24B4A; background: #FCEBEB; color: #501313; }
+  .opt-icon { font-size: 22px; }
+
+  /* DRAG DROP */
+  .drag-area { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  .drag-item { border: 2px dashed #B5D4F4; border-radius: 12px; padding: 10px; text-align: center; cursor: grab; background: #E6F1FB; font-size: 13px; color: #0C447C; font-weight: 500; }
+  .drag-item:active { opacity: 0.6; }
+  .drop-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .drop-zone { border: 2px dashed #ccc; border-radius: 12px; padding: 12px 8px; text-align: center; font-size: 13px; color: var(--color-text-secondary); min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .drop-zone.over { border-color: #378ADD; background: #E6F1FB; }
+  .drop-zone.matched { border-color: #639922; background: #EAF3DE; color: #27500A; }
+
+  /* FEEDBACK */
+  .feedback { border-radius: 12px; padding: 12px 16px; font-size: 14px; line-height: 1.7; margin-bottom: 1rem; display: none; }
+  .feedback.correct { background: #EAF3DE; color: #27500A; border: 1px solid #97C459; }
+  .feedback.wrong { background: #FCEBEB; color: #501313; border: 1px solid #F09595; }
+
+  /* FINAL */
+  #final { text-align: center; padding: 2rem 1rem; }
+  .trophy { font-size: 64px; margin-bottom: 12px; }
+  .final-title { font-size: 26px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .final-stars { font-size: 36px; margin: 12px 0; }
+  .final-msg { font-size: 15px; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 24px; }
+  .assemble-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; max-width: 420px; margin: 0 auto 1.5rem; }
+  .assemble-slot { border-radius: 14px; border: 2px solid #ccc; padding: 14px; text-align: center; font-size: 14px; color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-secondary); transition: all 0.2s; min-height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .assemble-slot:hover { border-color: #378ADD; }
+  .assemble-slot.placed { cursor: default; }
+  .assemble-slot.placed.blue { background: #E6F1FB; border-color: #378ADD; color: #0C447C; }
+  .assemble-slot.placed.green { background: #EAF3DE; border-color: #639922; color: #27500A; }
+  .assemble-slot.placed.orange { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+  .assemble-slot.placed.purple { background: #EEEDFE; border-color: #7F77DD; color: #3C3489; }
+  .parts-tray { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
+  .tray-piece { border-radius: 12px; border: 2px solid #ccc; padding: 10px 14px; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--color-background-primary); transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .tray-piece:hover { border-color: #378ADD; }
+  .tray-piece.used { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+  .next-btn { background: #378ADD; color: white; border: none; border-radius: 12px; padding: 12px 32px; font-size: 16px; cursor: pointer; font-weight: 500; }
+  .next-btn:hover { background: #185FA5; }
+  .replay-btn { background: transparent; color: #378ADD; border: 2px solid #378ADD; border-radius: 12px; padding: 10px 28px; font-size: 15px; cursor: pointer; font-weight: 500; }
+  .replay-btn:hover { background: #E6F1FB; }
+</style>
+
+<div id="game">
+
+  <div id="home" class="screen active">
+    <h1>مغامرة تيتو مع الحاسوب</h1>
+    <p>لعبة تعليمية تفاعلية لأجزاء الحاسوب</p>
+    <div class="story-box">
+      <span class="char">👦</span>
+      <strong>مرحباً! أنا تيتو.</strong><br>
+      حاسوبي تفكّك وضاعت أجزاؤه في أرجاء البيت!<br>
+      هل تساعدني في إيجادها وتعلّم اسم كل جزء ووظيفته؟
+    </div>
+    <button class="start-btn" onclick="startGame()">ابدأ المغامرة</button>
+  </div>
+
+  <div id="stage-screen" class="screen">
+    <div class="stage-bar" id="stageDots"></div>
+    <div class="score-bar">
+      <span class="score-label">نجوم تيتو</span>
+      <span class="stars-display" id="starsDisplay">☆☆☆☆☆☆☆☆</span>
+      <span class="score-num" id="scoreNum">0</span>
+    </div>
+    <div id="stageContent"></div>
+  </div>
+
+  <div id="final" class="screen">
+    <div class="trophy">🏆</div>
+    <div class="final-title">أحسنت يا بطل!</div>
+    <div class="final-stars" id="finalStars"></div>
+    <div class="final-msg">ساعدت تيتو في إيجاد جميع أجزاء حاسوبه!<br>الآن هيا نجمّع الحاسوب معاً في التحدي الأخير</div>
+    <p style="font-size:15px;font-weight:500;margin-bottom:1rem;color:var(--color-text-primary)">اضغط على كل جزء ثم اختر مكانه الصحيح</p>
+    <div class="parts-tray" id="partsTray"></div>
+    <div class="assemble-grid" id="assembleGrid"></div>
+    <div id="assembleMsg" style="font-size:16px;font-weight:500;margin:1rem 0;min-height:28px;"></div>
+    <div id="finalWin" style="display:none;">
+      <div style="font-size:48px;">🎉</div>
+      <div style="font-size:20px;font-weight:500;color:var(--color-text-primary);margin:8px 0;">جميل! جمّعت الحاسوب كاملاً!</div>
+      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:16px;">أنت نجم حقيقي يا صديقي تيتو!</div>
+      <button class="replay-btn" onclick="resetGame()">العب مرة أخرى</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const stages = [
+  {
+    id: 'screen', name: 'الشاشة', color: 'blue', icon: '🖥️',
+    sub: 'المرحلة 1 - المرحلة الأولى',
+    tasks: [
+      {
+        type: 'choice',
+        q: 'وجد تيتو جزءاً مربعاً يُعرض عليه كل شيء. ما اسمه؟',
+        options: [{t:'الشاشة',i:'🖥️',c:true},{t:'الفأرة',i:'🖱️',c:false},{t:'لوحة المفاتيح',i:'⌨️',c:false},{t:'الوحدة المركزية',i:'🖧',c:false}],
+        explain: '✅ الشاشة هي التي تُظهر لنا الصور والكلمات والأفلام! بدونها لا نرى شيئاً.'
+      },
+      {
+        type: 'choice',
+        q: 'ما وظيفة الشاشة؟',
+        options: [{t:'تحفظ المعلومات',i:'💾',c:false},{t:'تعرض الصور',i:'🖼️',c:true},{t:'تتحكم في الحاسوب',i:'🎮',c:false},{t:'تُشغّل الحاسوب',i:'⚡',c:false}],
+        explain: '✅ الشاشة تعرض كل ما يحدث في الحاسوب — مثل نافذة كبيرة نطلّ منها!'
+      }
+    ]
+  },
+  {
+    id: 'mouse', name: 'الفأرة', color: 'green', icon: '🖱️',
+    sub: 'المرحلة 2 - التحدي الثاني',
+    tasks: [
+      {
+        type: 'choice',
+        q: 'وجد تيتو شيئاً صغيراً يتحرك ويساعده على النقر. ما هو؟',
+        options: [{t:'الفأرة',i:'🖱️',c:true},{t:'الشاشة',i:'🖥️',c:false},{t:'لوحة المفاتيح',i:'⌨️',c:false},{t:'المفتاح',i:'🔑',c:false}],
+        explain: '✅ الفأرة! نحركها لنتنقل على الشاشة ونضغط بها لنختار ما نريد.'
+      },
+      {
+        type: 'choice',
+        q: 'أي صورة تمثّل الفأرة بشكل صحيح؟',
+        options: [{t:'جهاز يُكتب عليه',i:'⌨️',c:false},{t:'جهاز صغير يُمسك باليد',i:'🖱️',c:true},{t:'شاشة عرض',i:'🖥️',c:false},{t:'صندوق كبير',i:'📦',c:false}],
+        explain: '✅ الفأرة جهاز صغير نمسك به بيدنا ونحركه على المنضدة!'
+      }
+    ]
+  },
+  {
+    id: 'keyboard', name: 'لوحة المفاتيح', color: 'orange', icon: '⌨️',
+    sub: 'المرحلة 3 - التحدي الثالث',
+    tasks: [
+      {
+        type: 'choice',
+        q: 'وجد تيتو قطعة بها أزرار كثيرة عليها حروف وأرقام. ما اسمها؟',
+        options: [{t:'الوحدة المركزية',i:'🖧',c:false},{t:'الفأرة',i:'🖱️',c:false},{t:'لوحة المفاتيح',i:'⌨️',c:true},{t:'الشاشة',i:'🖥️',c:false}],
+        explain: '✅ لوحة المفاتيح! نستخدمها لكتابة الحروف والأرقام ولإعطاء الأوامر للحاسوب.'
+      },
+      {
+        type: 'choice',
+        q: 'ماذا نستخدم لوحة المفاتيح من أجله؟',
+        options: [{t:'عرض الصور',i:'🖼️',c:false},{t:'الكتابة والأوامر',i:'✍️',c:true},{t:'حفظ الملفات',i:'💾',c:false},{t:'تشغيل الفيديو',i:'▶️',c:false}],
+        explain: '✅ لوحة المفاتيح تساعدنا على الكتابة — كتابة الكلمات والأرقام والرسائل!'
+      }
+    ]
+  },
+  {
+    id: 'cpu', name: 'الوحدة المركزية', color: 'purple', icon: '🖧',
+    sub: 'المرحلة 4 - التحدي الأخير',
+    tasks: [
+      {
+        type: 'choice',
+        q: 'وجد تيتو صندوقاً كبيراً وثقيلاً — هو عقل الحاسوب! ما اسمه؟',
+        options: [{t:'الشاشة',i:'🖥️',c:false},{t:'الوحدة المركزية',i:'🖧',c:true},{t:'الفأرة',i:'🖱️',c:false},{t:'لوحة المفاتيح',i:'⌨️',c:false}],
+        explain: '✅ الوحدة المركزية هي عقل الحاسوب! تتحكم في كل شيء وتُشغّل جميع البرامج.'
+      },
+      {
+        type: 'choice',
+        q: 'أين توجد الوحدة المركزية؟',
+        options: [{t:'على الشاشة',i:'🖥️',c:false},{t:'في صندوق كبير منفصل',i:'🖧',c:true},{t:'داخل الفأرة',i:'🖱️',c:false},{t:'على لوحة المفاتيح',i:'⌨️',c:false}],
+        explain: '✅ الوحدة المركزية توجد في صندوق كبير يحمل كل الأجزاء الداخلية للحاسوب!'
+      }
+    ]
+  }
+];
+
+const colorMap = { blue: '#378ADD', green: '#639922', orange: '#EF9F27', purple: '#7F77DD' };
+let currentStage = 0, currentTask = 0, score = 0, selectedPart = null;
+const placements = { screen: null, mouse: null, keyboard: null, cpu: null };
+
+function startGame() {
+  showScreen('stage-screen');
+  currentStage = 0; currentTask = 0; score = 0;
+  updateScore();
+  renderStage();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateScore() {
+  const filled = '★'.repeat(score) + '☆'.repeat(Math.max(0, 8 - score));
+  document.getElementById('starsDisplay').textContent = filled;
+  document.getElementById('scoreNum').textContent = score;
+}
+
+function renderStageDots() {
+  const bar = document.getElementById('stageDots');
+  bar.innerHTML = stages.map((s, i) => {
+    let cls = i < currentStage ? 'done' : i === currentStage ? 'active' : '';
+    return `<div class="stage-dot ${cls}">${i < currentStage ? '✓' : i+1}</div>`;
+  }).join('');
+}
+
+function renderStage() {
+  renderStageDots();
+  const st = stages[currentStage];
+  const task = st.tasks[currentTask];
+  const el = document.getElementById('stageContent');
+
+  let html = `
+    <div class="stage-header ${st.color}">
+      <div class="stage-icon">${st.icon}</div>
+      <div class="stage-title ${st.color}">${st.name}</div>
+      <div class="stage-sub">${st.sub} — سؤال ${currentTask + 1} من ${st.tasks.length}</div>
+    </div>
+    <div class="task-card">
+      <div class="task-q">${task.q}</div>
+      <div class="options-grid">
+        ${task.options.map((o, i) => `
+          <button class="opt-btn" id="opt${i}" onclick="checkAnswer(${i}, ${o.c}, this)">
+            <span class="opt-icon">${o.i}</span>${o.t}
+          </button>`).join('')}
+      </div>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div style="text-align:center"><button class="next-btn" id="nextBtn" style="display:none" onclick="nextTask()">التالي ←</button></div>
+  `;
+  el.innerHTML = html;
+}
+
+function checkAnswer(idx, correct, btn) {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.style.pointerEvents = 'none');
+  const fb = document.getElementById('feedback');
+  const st = stages[currentStage];
+  const task = st.tasks[currentTask];
+
+  if (correct) {
+    btn.classList.add('correct');
+    score = Math.min(8, score + 1);
+    updateScore();
+    fb.className = 'feedback correct';
+    fb.textContent = task.explain;
+    playSound('correct');
+  } else {
+    btn.classList.add('wrong');
+    btns.forEach((b, i) => { if (task.options[i].c) b.classList.add('correct'); });
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ حاول مرة أخرى! ' + task.explain;
+    playSound('wrong');
+  }
+  fb.style.display = 'block';
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function nextTask() {
+  currentTask++;
+  if (currentTask >= stages[currentStage].tasks.length) {
+    currentStage++;
+    currentTask = 0;
+    if (currentStage >= stages.length) {
+      showFinal();
+    } else {
+      renderStage();
+    }
+  } else {
+    renderStage();
+  }
+}
+
+function showFinal() {
+  showScreen('final');
+  const filled = '★'.repeat(score) + '☆'.repeat(Math.max(0, 8 - score));
+  document.getElementById('finalStars').textContent = filled;
+  buildAssemble();
+}
+
+function buildAssemble() {
+  const tray = document.getElementById('partsTray');
+  const grid = document.getElementById('assembleGrid');
+  const msg = document.getElementById('assembleMsg');
+  msg.textContent = '';
+
+  const parts = [
+    { id: 'screen', name: 'الشاشة', icon: '🖥️', color: 'blue' },
+    { id: 'mouse', name: 'الفأرة', icon: '🖱️', color: 'green' },
+    { id: 'keyboard', name: 'لوحة المفاتيح', icon: '⌨️', color: 'orange' },
+    { id: 'cpu', name: 'الوحدة المركزية', icon: '🖧', color: 'purple' }
+  ];
+
+  tray.innerHTML = parts.map(p => `
+    <div class="tray-piece" id="tray-${p.id}" onclick="selectPart('${p.id}', '${p.name}', '${p.icon}', '${p.color}')">
+      <span style="font-size:20px">${p.icon}</span>${p.name}
+    </div>`).join('');
+
+  grid.innerHTML = parts.map(p => `
+    <div class="assemble-slot" id="slot-${p.id}" onclick="placePart('${p.id}')">
+      <div style="font-size:13px;color:var(--color-text-secondary)">مكان</div>
+      <div style="font-size:13px;font-weight:500">${p.name}</div>
+    </div>`).join('');
+}
+
+function selectPart(id, name, icon, color) {
+  document.querySelectorAll('.tray-piece').forEach(t => t.style.borderColor = '');
+  selectedPart = { id, name, icon, color };
+  const el = document.getElementById('tray-' + id);
+  if (el) el.style.borderColor = colorMap[color] || '#378ADD';
+  document.getElementById('assembleMsg').textContent = `اختر مكان "${name}" في الحاسوب`;
+}
+
+function placePart(slotId) {
+  if (!selectedPart) { document.getElementById('assembleMsg').textContent = 'أولاً اختر جزءاً من الأجزاء أعلاه!'; return; }
+  if (selectedPart.id === slotId) {
+    const slot = document.getElementById('slot-' + slotId);
+    slot.innerHTML = `<span style="font-size:28px">${selectedPart.icon}</span><span style="font-size:13px;font-weight:500">${selectedPart.name}</span>`;
+    slot.className = `assemble-slot placed ${selectedPart.color}`;
+    const trayPiece = document.getElementById('tray-' + slotId);
+    if (trayPiece) trayPiece.classList.add('used');
+    placements[slotId] = true;
+    document.getElementById('assembleMsg').textContent = '✅ أحسنت!';
+    selectedPart = null;
+    playSound('correct');
+    if (Object.values(placements).every(v => v)) {
+      setTimeout(() => { document.getElementById('finalWin').style.display = 'block'; }, 600);
+    }
+  } else {
+    document.getElementById('assembleMsg').textContent = '❌ هذا ليس المكان الصحيح، حاول مرة أخرى!';
+    playSound('wrong');
+  }
+}
+
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type === 'correct') {
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+    } else {
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.setValueAtTime(200, ctx.currentTime + 0.15);
+    }
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch(e) {}
+}
+
+function resetGame() {
+  currentStage = 0; currentTask = 0; score = 0; selectedPart = null;
+  Object.keys(placements).forEach(k => placements[k] = null);
+  document.getElementById('finalWin').style.display = 'none';
+  showScreen('home');
+}
+</script>

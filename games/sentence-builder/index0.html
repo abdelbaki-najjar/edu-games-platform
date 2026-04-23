@@ -666,37 +666,12 @@ body {
 .win-stat .wl { font-size: 0.78rem; color: var(--purple); font-weight: 800; }
 
 /* ===== SETTINGS SCREEN ===== */
-#settingsScreen .modal-box { 
-  max-width: 560px; 
-  text-align: right; 
-  border-color: #A8EDEA; 
-  box-shadow: 0 8px 0 #7bd5d2, 0 14px 40px rgba(0,0,0,0.15);
-  display: flex;
-  flex-direction: column;
-  max-height: 90vh;
-  padding: 20px 20px 0;
-  overflow: hidden;
-}
-.settings-scroll-area {
-  overflow-y: auto;
-  flex: 1;
-  padding: 0 8px 16px;
-}
-.settings-scroll-area::-webkit-scrollbar { width: 6px; }
-.settings-scroll-area::-webkit-scrollbar-track { background: #f5f5f5; border-radius: 3px; }
-.settings-scroll-area::-webkit-scrollbar-thumb { background: #ce93d8; border-radius: 3px; }
-.settings-btns-sticky {
-  padding: 12px 0 16px;
-  background: linear-gradient(160deg, #fff9f0, #ffffff);
-  border-top: 2px solid #f0f0f0;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-}
+#settingsScreen .modal-box { max-width: 560px; text-align: right; border-color: #A8EDEA; box-shadow: 0 8px 0 #7bd5d2, 0 14px 40px rgba(0,0,0,0.15); }
 .settings-title { font-size: 1.6rem; font-weight: 900; color: var(--purple); text-align: center; margin-bottom: 20px; }
-.sentences-list { margin-bottom: 8px; }
+.sentences-list { max-height: 300px; overflow-y: auto; margin-bottom: 16px; }
+.sentences-list::-webkit-scrollbar { width: 6px; }
+.sentences-list::-webkit-scrollbar-track { background: #f5f5f5; border-radius: 3px; }
+.sentences-list::-webkit-scrollbar-thumb { background: #ce93d8; border-radius: 3px; }
 
 .sentence-item {
   background: #F8F9FA;
@@ -837,6 +812,7 @@ body {
 .add-form input:focus, .add-form select:focus { border-color: #FFD600; background: #FFFDE7; }
 .add-form input::placeholder { color: #bbb; }
 
+.settings-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .btn-add-sent { background: linear-gradient(135deg, #38ef7d, #11998e); color: white; box-shadow: 0 4px 0 #0d7a70; }
 .btn-save     { background: linear-gradient(135deg, #F7971E, #FFD200); color: #2c2c54; box-shadow: 0 4px 0 #c9a200; }
 .btn-close-s  { background: white; color: #888; border: 2.5px solid #ddd; box-shadow: 0 3px 0 #ccc; }
@@ -1389,8 +1365,6 @@ body {
   <div class="modal-box">
     <div class="settings-title">⚙️ تخصيص اللعبة</div>
 
-    <div class="settings-scroll-area">
-
     <!-- قسم إعدادات الموقت -->
     <div class="timer-settings-box">
       <div class="timer-settings-title">⏱️ مدة المؤقت</div>
@@ -1425,16 +1399,12 @@ body {
       </div>
       <label>تلميح للتلاميذ</label>
       <input type="text" id="newHintInput" placeholder="مثال: ماذا يأكل الكلب؟" dir="rtl">
-      <label>ترتيبات بديلة صحيحة (اختياري) — كل ترتيب في سطر مستقل، الكلمات مفصولة بفاصلة</label>
-      <textarea id="newAltsInput" rows="3" placeholder="مثال:&#10;الطفل، ذهب، في، زيارة، الى، تونس&#10;ذهب، في، زيارة، الطفل، الى، تونس" dir="rtl" style="width:100%;border-radius:10px;border:2px solid #ce93d8;padding:8px;font-family:Tajawal,sans-serif;font-size:0.95rem;resize:vertical;margin-bottom:10px;"></textarea>
-      <button class="btn btn-add-sent" onclick="addSentence()" style="width:100%;margin-bottom:4px;">➕ إضافة الجملة</button>
     </div>
 
     <div class="sentences-list" id="sentencesList"></div>
 
-    </div><!-- end scroll area -->
-
-    <div class="settings-btns-sticky">
+    <div class="settings-btns">
+      <button class="btn btn-add-sent" onclick="addSentence()">➕ إضافة</button>
       <button class="btn btn-save" onclick="saveAndClose()">💾 حفظ وإغلاق</button>
       <button class="btn btn-close-s" onclick="closeSettings()">✖ إغلاق</button>
     </div>
@@ -1501,29 +1471,6 @@ let sentences = [
   {words:["القِطَارُ","يَسِيرُ","بِسُرْعَةٍ","عَلَى","القُضْبَانِ"],  emoji:"🚆🛤️",hint:"كيف يسير القطار؟",
    alts:[["يَسِيرُ","القِطَارُ","بِسُرْعَةٍ","عَلَى","القُضْبَانِ"]]},
 ];
-
-// ===== LOCALSTORAGE =====
-const LS_KEY = 'sentence_game_data';
-
-function saveSentences() {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(sentences)); } catch(e) {}
-}
-
-function loadSentences() {
-  try {
-    const saved = localStorage.getItem(LS_KEY);
-    if (saved) {
-      sentences = JSON.parse(saved);
-      // تنظيف الترتيبات المولَّدة تلقائياً (أكثر من 3 بدائل تعني توليداً تلقائياً)
-      sentences.forEach(s => {
-        if (s.alts && s.alts.length > 3) s.alts = [];
-      });
-    }
-  } catch(e) {}
-}
-
-// تحميل البيانات المحفوظة
-loadSentences();
 
 // ===== STATE =====
 let idx=0, score=0, totalStars=0, correctCount=0;
@@ -1900,7 +1847,7 @@ function openSettings(){
   document.getElementById('settingsScreen').classList.add('open');
 }
 function closeSettings(){ document.getElementById('settingsScreen').classList.remove('open'); }
-function saveAndClose(){ saveSentences(); closeSettings(); idx=0; init(); }
+function saveAndClose(){ closeSettings(); idx=0; init(); }
 
 function renderSentencesList(){
   const list = document.getElementById('sentencesList');
@@ -1924,20 +1871,7 @@ function renderSentencesList(){
 function deleteSentence(i){
   if(sentences.length<=3){ alert('يجب أن تبقى 3 جمل على الأقل!'); return; }
   sentences.splice(i,1);
-  saveSentences();
   renderSentencesList();
-}
-
-// توليد كل الترتيبات الممكنة للكلمات (تستخدم للجمل القصيرة فقط ≤5 كلمات)
-function generatePermutations(arr) {
-  if (arr.length > 5) return []; // تجنب الانفجار الحسابي للجمل الطويلة
-  if (arr.length <= 1) return [arr];
-  const result = [];
-  arr.forEach((item, i) => {
-    const rest = [...arr.slice(0,i), ...arr.slice(i+1)];
-    generatePermutations(rest).forEach(p => result.push([item, ...p]));
-  });
-  return result;
 }
 
 // ===== INLINE EDIT =====
@@ -1984,11 +1918,6 @@ function startEdit(i) {
       <label>التلميح النصي</label>
       <input id="eh-${i}" value="${s.hint}" dir="rtl">
     </div>
-    <div>
-      <label>ترتيبات بديلة صحيحة (اختياري) — كل ترتيب في سطر مستقل</label>
-      <textarea id="ea-${i}" rows="3" dir="rtl" style="width:100%;border-radius:10px;border:2px solid #ce93d8;padding:8px;font-family:Tajawal,sans-serif;font-size:0.9rem;resize:vertical;"
-        placeholder="مثال:&#10;الطفل، ذهب، في، زيارة">${(s.alts||[]).map(a=>a.join('، ')).join('\n')}</textarea>
-    </div>
     <div class="edit-btns-row">
       <button class="btn-cancel-edit" onclick="cancelEdit()">✖ إلغاء</button>
       <button class="btn-save-edit"   onclick="saveEdit(${i})">💾 حفظ</button>
@@ -2025,18 +1954,9 @@ function saveEdit(i) {
   const words = raw.split(/[,،]/).map(w => w.trim()).filter(Boolean);
   if (words.length < 2) { alert('أدخل كلمتين على الأقل!'); return; }
 
-  const altsRaw = document.getElementById(`ea-${i}`).value.trim();
-  let alts = [];
-  if (altsRaw) {
-    alts = altsRaw.split('\n')
-      .map(line => line.split(/[,،]/).map(w => w.trim()).filter(Boolean))
-      .filter(a => a.length >= 2 && a.join(',') !== words.join(','));
-  }
-
-  sentences[i] = { ...sentences[i], words, emoji, hint, img, alts };
+  sentences[i] = { ...sentences[i], words, emoji, hint, img };
   currentEditIdx = null;
   sfxCorrect();
-  saveSentences();
   renderSentencesList();
 }
 
@@ -2054,24 +1974,12 @@ function addSentence(){
   if(!raw){ alert('أدخل الجملة أولاً!'); return; }
   const words = raw.split(/[,،]/).map(w=>w.trim()).filter(Boolean);
   if(words.length<2){ alert('أدخل كلمتين على الأقل!'); return; }
-
-  // قراءة الترتيبات البديلة من الحقل فقط (لا توليد تلقائي)
-  const altsRaw = document.getElementById('newAltsInput').value.trim();
-  let alts = [];
-  if (altsRaw) {
-    alts = altsRaw.split('\n')
-      .map(line => line.split(/[,،]/).map(w => w.trim()).filter(Boolean))
-      .filter(a => a.length >= 2 && a.join(',') !== words.join(','));
-  }
-
-  sentences.push({words, emoji, hint, img: img||undefined, alts});
+  sentences.push({words, emoji, hint, img: img||undefined});
   sentences.sort((a,b)=>a.words.length-b.words.length);
   document.getElementById('newSentenceInput').value='';
   document.getElementById('newEmojiInput').value='';
   document.getElementById('newHintInput').value='';
-  document.getElementById('newAltsInput').value='';
   clearImgInput();
-  saveSentences();
   renderSentencesList();
   sfxCorrect();
 }

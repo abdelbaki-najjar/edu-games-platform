@@ -1512,13 +1512,7 @@ function saveSentences() {
 function loadSentences() {
   try {
     const saved = localStorage.getItem(LS_KEY);
-    if (saved) {
-      sentences = JSON.parse(saved);
-      // تنظيف الترتيبات المولَّدة تلقائياً (أكثر من 3 بدائل تعني توليداً تلقائياً)
-      sentences.forEach(s => {
-        if (s.alts && s.alts.length > 3) s.alts = [];
-      });
-    }
+    if (saved) sentences = JSON.parse(saved);
   } catch(e) {}
 }
 
@@ -2031,6 +2025,8 @@ function saveEdit(i) {
     alts = altsRaw.split('\n')
       .map(line => line.split(/[,،]/).map(w => w.trim()).filter(Boolean))
       .filter(a => a.length >= 2 && a.join(',') !== words.join(','));
+  } else if (words.length <= 5) {
+    alts = generatePermutations(words).filter(p => p.join(',') !== words.join(','));
   }
 
   sentences[i] = { ...sentences[i], words, emoji, hint, img, alts };
@@ -2055,13 +2051,15 @@ function addSentence(){
   const words = raw.split(/[,،]/).map(w=>w.trim()).filter(Boolean);
   if(words.length<2){ alert('أدخل كلمتين على الأقل!'); return; }
 
-  // قراءة الترتيبات البديلة من الحقل فقط (لا توليد تلقائي)
+  // قراءة الترتيبات البديلة من الحقل + توليد تلقائي للجمل ≤5 كلمات
   const altsRaw = document.getElementById('newAltsInput').value.trim();
   let alts = [];
   if (altsRaw) {
     alts = altsRaw.split('\n')
       .map(line => line.split(/[,،]/).map(w => w.trim()).filter(Boolean))
       .filter(a => a.length >= 2 && a.join(',') !== words.join(','));
+  } else if (words.length <= 5) {
+    alts = generatePermutations(words).filter(p => p.join(',') !== words.join(','));
   }
 
   sentences.push({words, emoji, hint, img: img||undefined, alts});

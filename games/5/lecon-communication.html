@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les Moyens de Communication – CM1</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1a73e8;
+    --blue-light: #e8f0fe;
+    --green: #34a853;
+    --green-light: #e6f4ea;
+    --red: #ea4335;
+    --red-light: #fce8e6;
+    --yellow: #fbbc04;
+    --yellow-light: #fef7e0;
+    --purple: #7c4dff;
+    --purple-light: #ede7f6;
+    --orange: #ff6d00;
+    --bg: #f0f4ff;
+    --white: #ffffff;
+    --dark: #202124;
+    --gray: #5f6368;
+    --radius: 18px;
+    --shadow: 0 4px 24px rgba(26,115,232,0.13);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--dark);
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+    color: white;
+    padding: 20px 24px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute; bottom: -50px; left: -30px;
+    width: 140px; height: 140px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .header-date {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .header .subtitle {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-top: 4px;
+  }
+  .header-emoji { font-size: 36px; margin-bottom: 8px; display: block; }
+
+  /* NAV TABS */
+  .nav {
+    display: flex;
+    overflow-x: auto;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: sticky; top: 0; z-index: 100;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    flex: none;
+    padding: 14px 18px;
+    border: none;
+    background: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-btn.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+  }
+  .nav-btn:hover { color: var(--blue); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 20px 16px 80px; max-width: 700px; margin: 0 auto; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* OBJECTIFS */
+  .obj-list { list-style: none; }
+  .obj-list li {
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--blue-light);
+    color: #1557b0;
+  }
+  .obj-list li .icon { font-size: 18px; flex-shrink: 0; }
+
+  /* LEÇON */
+  .lesson-box {
+    background: linear-gradient(135deg, #e8f0fe, #f0f4ff);
+    border-left: 5px solid var(--blue);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .lesson-box h3 { color: var(--blue); font-size: 15px; margin-bottom: 8px; }
+  .lesson-box p, .lesson-box ul { font-size: 14px; color: #333; line-height: 1.7; }
+  .lesson-box ul { padding-left: 20px; }
+
+  .parts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .part-card {
+    background: white;
+    border: 2px solid #e0e7ff;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .part-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,115,232,0.15); }
+  .part-card .part-emoji { font-size: 30px; margin-bottom: 6px; }
+  .part-card .part-name { font-weight: 700; font-size: 13px; color: var(--blue); }
+  .part-card .part-desc { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  /* BOUTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-blue { background: var(--blue); color: white; }
+  .btn-blue:hover { background: #1557b0; transform: translateY(-1px); }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #2d7a47; }
+  .btn-gray { background: #f1f3f4; color: var(--dark); }
+  .btn-gray:hover { background: #e0e4ea; }
+
+  /* SCORE */
+  .score-bar {
+    background: #f1f3f4;
+    border-radius: 50px;
+    height: 14px;
+    overflow: hidden;
+    margin: 8px 0 4px;
+  }
+  .score-fill {
+    height: 100%;
+    border-radius: 50px;
+    background: linear-gradient(90deg, var(--green), #56d364);
+    transition: width 0.6s ease;
+  }
+  .score-text { font-size: 13px; color: var(--gray); text-align: right; }
+
+  /* ======== JEU 1 : ASSOCIER ======== */
+  .match-container { display: flex; gap: 12px; flex-wrap: wrap; }
+  .match-col { flex: 1; min-width: 120px; }
+  .match-col h4 { text-align: center; font-size: 13px; color: var(--gray); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .match-item {
+    background: white;
+    border: 2.5px solid #e0e7ff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .match-item:hover { border-color: var(--blue); }
+  .match-item.selected { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+  .match-item.correct { border-color: var(--green); background: var(--green-light); color: var(--green); pointer-events: none; }
+  .match-item.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); }
+  .match-item.disabled { pointer-events: none; opacity: 0.5; }
+
+  /* ======== JEU 2 : VRAI/FAUX ======== */
+  .quiz-question {
+    background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .quiz-question p { font-size: 16px; font-weight: 700; margin-bottom: 14px; line-height: 1.4; }
+  .vf-btns { display: flex; gap: 10px; justify-content: center; }
+  .vf-btn {
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: 2.5px solid;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .vf-btn.vrai { border-color: var(--green); color: var(--green); background: white; }
+  .vf-btn.faux { border-color: var(--red); color: var(--red); background: white; }
+  .vf-btn.vrai:hover { background: var(--green); color: white; }
+  .vf-btn.faux:hover { background: var(--red); color: white; }
+  .vf-btn.correct { background: var(--green); color: white; border-color: var(--green); }
+  .vf-btn.incorrect { background: var(--red); color: white; border-color: var(--red); }
+  .vf-btn:disabled { cursor: not-allowed; }
+  .feedback {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 50px;
+    display: inline-block;
+  }
+  .feedback.ok { background: var(--green-light); color: var(--green); }
+  .feedback.ko { background: var(--red-light); color: var(--red); }
+
+  /* ======== JEU 3 : CLASSEMENT ======== */
+  .sort-area { display: flex; gap: 12px; flex-wrap: wrap; }
+  .sort-bin {
+    flex: 1; min-width: 130px;
+    border-radius: 14px;
+    padding: 12px;
+    min-height: 180px;
+  }
+  .sort-bin.bienfaits { background: var(--green-light); border: 2px dashed var(--green); }
+  .sort-bin.mesfaits { background: var(--red-light); border: 2px dashed var(--red); }
+  .sort-bin h4 { text-align: center; font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+  .sort-bin.bienfaits h4 { color: var(--green); }
+  .sort-bin.mesfaits h4 { color: var(--red); }
+  .sort-cards { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 14px; }
+  .sort-card {
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+  }
+  .sort-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+  .sort-card.placed-bien { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .sort-card.placed-mal { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .placed-item {
+    background: white;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .sort-instruction { font-size: 13px; color: var(--gray); margin-bottom: 10px; text-align: center; font-style: italic; }
+
+  /* ======== JEU 4 : MÉMOIRE ======== */
+  .memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .mem-card {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    border: 2.5px solid #e0e7ff;
+    background: white;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--blue);
+    overflow: hidden;
+    position: relative;
+  }
+  .mem-card .mem-front, .mem-card .mem-back {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
+  .mem-card .mem-front { background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; font-size: 22px; }
+  .mem-card .mem-back { background: white; opacity: 0; pointer-events: none; padding: 6px; text-align: center; }
+  .mem-card.flipped .mem-front { opacity: 0; pointer-events: none; }
+  .mem-card.flipped .mem-back { opacity: 1; pointer-events: none; }
+  .mem-card.matched { border-color: var(--green); }
+  .mem-card.matched .mem-back { background: var(--green-light); }
+  .mem-card .back-emoji { font-size: 24px; margin-bottom: 4px; }
+  .mem-card .back-label { font-size: 11px; font-weight: 800; color: var(--dark); }
+
+  /* ======== Q&R ORAL ======== */
+  .qa-item {
+    border-radius: 14px;
+    border: 2px solid #e0e7ff;
+    overflow: hidden;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .qa-question {
+    padding: 14px 16px;
+    background: var(--blue-light);
+    font-weight: 700;
+    font-size: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .qa-answer {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s;
+    background: white;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .qa-item.open .qa-answer { padding: 14px 16px; max-height: 200px; }
+  .qa-arrow { transition: transform 0.3s; font-size: 18px; }
+  .qa-item.open .qa-arrow { transform: rotate(90deg); }
+
+  /* ======== PHRASES ======== */
+  .phrase-item {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 2px solid #e0e7ff;
+  }
+  .phrase-text { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.6; }
+  .blank {
+    display: inline-block;
+    border-bottom: 2.5px solid var(--blue);
+    min-width: 80px;
+    margin: 0 4px;
+    vertical-align: bottom;
+  }
+  .phrase-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .phrase-opt {
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 2px solid var(--blue);
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s;
+  }
+  .phrase-opt:hover { background: var(--blue); color: white; }
+  .phrase-opt.used { opacity: 0.4; pointer-events: none; }
+  .phrase-opt.correct-answer { background: var(--green); color: white; border-color: var(--green); }
+  .phrase-opt.wrong-answer { background: var(--red); color: white; border-color: var(--red); }
+
+  /* RÉSULTAT FINAL */
+  .result-box {
+    text-align: center;
+    padding: 24px;
+    border-radius: 18px;
+    margin-top: 16px;
+  }
+  .result-box.excellent { background: linear-gradient(135deg, #e6f4ea, #c8e6c9); }
+  .result-box.good { background: linear-gradient(135deg, #fef7e0, #fff3cd); }
+  .result-box.tryagain { background: linear-gradient(135deg, #fce8e6, #ffcdd2); }
+  .result-emoji { font-size: 52px; margin-bottom: 8px; }
+  .result-score { font-size: 32px; font-weight: 800; font-family: 'Baloo 2', cursive; }
+
+  /* PROGRESS DOTS */
+  .progress-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #e0e7ff; transition: all 0.3s; }
+  .dot.done { background: var(--green); }
+  .dot.current { background: var(--blue); transform: scale(1.3); }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    margin: 4px;
+  }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+
+  .center { text-align: center; }
+  .mt { margin-top: 12px; }
+  .gap { height: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">💻</span>
+  <div class="header-date">Mercredi 22 Avril 2026 · 8h10</div>
+  <h1>Les Moyens de Communication</h1>
+  <div class="subtitle">Lecture documentaire — Manuel page 108</div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSection('objectifs')">🎯 Objectifs</button>
+  <button class="nav-btn" onclick="showSection('lecon')">📖 Leçon</button>
+  <button class="nav-btn" onclick="showSection('jeu1')">🎮 Jeu 1</button>
+  <button class="nav-btn" onclick="showSection('jeu2')">❓ Jeu 2</button>
+  <button class="nav-btn" onclick="showSection('jeu3')">📊 Jeu 3</button>
+  <button class="nav-btn" onclick="showSection('jeu4')">🧠 Jeu 4</button>
+  <button class="nav-btn" onclick="showSection('activites')">✏️ Activités</button>
+</nav>
+
+<!-- ===== OBJECTIFS ===== -->
+<div class="section active" id="objectifs">
+  <div class="card">
+    <div class="card-title">🎯 Ce que tu vas apprendre</div>
+    <ul class="obj-list">
+      <li><span class="icon">🌐</span> Citer trois utilisations d'Internet</li>
+      <li><span class="icon">🖥️</span> Nommer les différentes parties de l'ordinateur</li>
+      <li><span class="icon">📖</span> Définir Internet</li>
+      <li><span class="icon">⚖️</span> Reconnaître les bienfaits et les méfaits d'Internet</li>
+      <li><span class="icon">🎮</span> Participer à des jeux ludiques pour consolider les apprentissages</li>
+    </ul>
+  </div>
+  <div class="card center">
+    <div class="card-title" style="justify-content:center">📚 Informations</div>
+    <span class="badge badge-blue">📅 Mercredi 22 Avril 2026</span>
+    <span class="badge badge-blue">⏰ 8h10</span>
+    <span class="badge badge-green">📖 Manuel page 108</span>
+    <div class="gap"></div>
+    <button class="btn btn-blue" onclick="showSection('lecon')">Commencer la leçon →</button>
+  </div>
+</div>
+
+<!-- ===== LEÇON ===== -->
+<div class="section" id="lecon">
+
+  <div class="card">
+    <div class="card-title">🌐 Qu'est-ce qu'Internet ?</div>
+    <div class="lesson-box">
+      <h3>Définition</h3>
+      <p><strong>Internet</strong> est un grand réseau mondial qui relie des millions d'ordinateurs entre eux à travers le monde. Il permet d'échanger des informations, de communiquer et d'accéder à des contenus variés.</p>
+    </div>
+    <div class="lesson-box">
+      <h3>🖱️ Trois utilisations d'Internet</h3>
+      <ul>
+        <li><strong>Communiquer</strong> : envoyer des e-mails, chatter, appels vidéo</li>
+        <li><strong>S'informer</strong> : lire des articles, regarder des vidéos, faire des recherches</li>
+        <li><strong>Se divertir</strong> : écouter de la musique, jouer en ligne, regarder des films</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🖥️ Les parties de l'ordinateur</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">Appuie sur chaque partie pour en savoir plus !</p>
+    <div class="parts-grid">
+      <div class="part-card" onclick="togglePart(this, 'Unité centrale : c\'est le cerveau de l\'ordinateur. Il traite toutes les informations.')">
+        <div class="part-emoji">🖥️</div>
+        <div class="part-name">Unité centrale</div>
+        <div class="part-desc" style="display:none"></div>
+      </div>
+      <div class="part-card" onclick="togglePart(this, 'L\'écran (moniteur) : affiche les images et les textes pour que tu puisses voir ce que fait l\'ordinateur.')">
+        <div class="part-emoji">🖱️</div>
+        <div class="part-name">Écran (moniteur)</div>
+        <div class="part-desc" style="display:none"></div>
+      </div>
+      <div class="part-card" onclick="togglePart(this, 'Le clavier : permet de taper du texte, des chiffres et des commandes.')">
+        <div class="part-emoji">⌨️</div>
+        <div class="part-name">Clavier</div>
+        <div class="part-desc" style="display:none"></div>
+      </div>
+      <div class="part-card" onclick="togglePart(this, 'La souris : sert à déplacer le curseur sur l\'écran et à cliquer sur des éléments.')">
+        <div class="part-emoji">🖱️</div>
+        <div class="part-name">Souris</div>
+        <div class="part-desc" style="display:none"></div>
+      </div>
+      <div class="part-card" onclick="togglePart(this, 'Les haut-parleurs : diffusent les sons, la musique et les voix de l\'ordinateur.')">
+        <div class="part-emoji">🔊</div>
+        <div class="part-name">Haut-parleurs</div>
+        <div class="part-desc" style="display:none"></div>
+      </div>
+      <div class="part-card" onclick="togglePart(this, 'L\'imprimante : permet d\'imprimer des documents sur du papier.')">
+        <div class="part-emoji">🖨️</div>
+        <div class="part-name">Imprimante</div>
+        <div class="part-desc" style="display:none"></div>
+      </div>
+    </div>
+    <div id="part-info" style="display:none;margin-top:12px;padding:12px;background:var(--blue-light);border-radius:12px;font-size:14px;color:#1557b0;font-weight:600;line-height:1.5;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚖️ Bienfaits et méfaits d'Internet</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:130px;">
+        <div style="background:var(--green-light);border-radius:12px;padding:12px;">
+          <div style="font-weight:800;color:var(--green);margin-bottom:8px;font-size:14px;">✅ Bienfaits</div>
+          <ul style="font-size:13px;padding-left:16px;line-height:2;color:#2d6a3f;">
+            <li>Accès à l'information</li>
+            <li>Communication rapide</li>
+            <li>Apprentissage en ligne</li>
+            <li>Divertissement</li>
+          </ul>
+        </div>
+      </div>
+      <div style="flex:1;min-width:130px;">
+        <div style="background:var(--red-light);border-radius:12px;padding:12px;">
+          <div style="font-weight:800;color:var(--red);margin-bottom:8px;font-size:14px;">❌ Méfaits</div>
+          <ul style="font-size:13px;padding-left:16px;line-height:2;color:#8b1a14;">
+            <li>Dépendance</li>
+            <li>Fausses informations</li>
+            <li>Dangers en ligne</li>
+            <li>Fatigue des yeux</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="center">
+    <button class="btn btn-blue" onclick="showSection('jeu1')">Passer aux jeux 🎮</button>
+  </div>
+</div>
+
+<!-- ===== JEU 1 : ASSOCIER ===== -->
+<div class="section" id="jeu1">
+  <div class="card">
+    <div class="card-title">🎮 Jeu 1 : Associe l'usage à Internet</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Clique sur un usage (à gauche), puis sur la bonne définition (à droite) !</p>
+    
+    <div class="score-bar"><div class="score-fill" id="j1-bar" style="width:0%"></div></div>
+    <div class="score-text" id="j1-score">0 / 6</div>
+    <div class="gap"></div>
+
+    <div class="match-container">
+      <div class="match-col">
+        <h4>📌 Usages</h4>
+        <div class="match-item" data-id="a" onclick="selectMatch(this,'left','a')">📧 E-mail</div>
+        <div class="match-item" data-id="b" onclick="selectMatch(this,'left','b')">🔍 Recherche</div>
+        <div class="match-item" data-id="c" onclick="selectMatch(this,'left','c')">🎬 Streaming</div>
+        <div class="match-item" data-id="d" onclick="selectMatch(this,'left','d')">🎮 Jeux en ligne</div>
+        <div class="match-item" data-id="e" onclick="selectMatch(this,'left','e')">📰 Actualités</div>
+        <div class="match-item" data-id="f" onclick="selectMatch(this,'left','f')">💬 Chat</div>
+      </div>
+      <div class="match-col">
+        <h4>💡 Définitions</h4>
+        <div class="match-item" data-id="c" onclick="selectMatch(this,'right','c')">Regarder des films sur Internet</div>
+        <div class="match-item" data-id="f" onclick="selectMatch(this,'right','f')">Discuter en temps réel</div>
+        <div class="match-item" data-id="a" onclick="selectMatch(this,'right','a')">Envoyer des messages électroniques</div>
+        <div class="match-item" data-id="e" onclick="selectMatch(this,'right','e')">Lire les informations du monde</div>
+        <div class="match-item" data-id="d" onclick="selectMatch(this,'right','d')">Jouer avec d'autres joueurs</div>
+        <div class="match-item" data-id="b" onclick="selectMatch(this,'right','b')">Trouver des informations</div>
+      </div>
+    </div>
+
+    <div class="gap"></div>
+    <div class="center">
+      <button class="btn btn-gray" onclick="resetJeu1()">🔄 Recommencer</button>
+      <span style="display:inline-block;width:10px"></span>
+      <button class="btn btn-green" onclick="showSection('jeu2')">Jeu suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JEU 2 : VRAI/FAUX ===== -->
+<div class="section" id="jeu2">
+  <div class="card">
+    <div class="card-title">❓ Jeu 2 : Vrai ou Faux ?</div>
+    
+    <div class="progress-dots" id="j2-dots"></div>
+    <div class="score-bar"><div class="score-fill" id="j2-bar" style="width:0%"></div></div>
+    <div class="score-text" id="j2-score">0 / 8</div>
+    <div class="gap"></div>
+
+    <div id="j2-container"></div>
+
+    <div class="center mt">
+      <button class="btn btn-gray" onclick="resetJeu2()">🔄 Recommencer</button>
+      <span style="display:inline-block;width:10px"></span>
+      <button class="btn btn-green" onclick="showSection('jeu3')">Jeu suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JEU 3 : CLASSEMENT ===== -->
+<div class="section" id="jeu3">
+  <div class="card">
+    <div class="card-title">📊 Jeu 3 : Bienfaits ou Méfaits ?</div>
+    <p class="sort-instruction">Clique sur chaque carte, puis choisis si c'est un bienfait ✅ ou un méfait ❌ d'Internet.</p>
+
+    <div class="score-bar"><div class="score-fill" id="j3-bar" style="width:0%"></div></div>
+    <div class="score-text" id="j3-score">0 / 8</div>
+    <div class="gap"></div>
+
+    <div class="sort-cards" id="j3-cards"></div>
+
+    <div id="j3-picker" style="display:none;background:white;border:2px solid var(--blue);border-radius:14px;padding:14px;margin-bottom:12px;text-align:center;">
+      <div id="j3-picker-label" style="font-weight:700;font-size:15px;margin-bottom:12px;"></div>
+      <button class="btn btn-green" onclick="placeItem(true)" style="margin:4px;">✅ Bienfait</button>
+      <button class="btn" style="background:var(--red);color:white;margin:4px;" onclick="placeItem(false)">❌ Méfait</button>
+    </div>
+
+    <div class="sort-area">
+      <div class="sort-bin bienfaits">
+        <h4>✅ Bienfaits</h4>
+        <div id="bin-bien"></div>
+      </div>
+      <div class="sort-bin mesfaits">
+        <h4>❌ Méfaits</h4>
+        <div id="bin-mal"></div>
+      </div>
+    </div>
+
+    <div class="center mt">
+      <button class="btn btn-gray" onclick="resetJeu3()">🔄 Recommencer</button>
+      <span style="display:inline-block;width:10px"></span>
+      <button class="btn btn-green" onclick="showSection('jeu4')">Jeu suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JEU 4 : MÉMOIRE ===== -->
+<div class="section" id="jeu4">
+  <div class="card">
+    <div class="card-title">🧠 Jeu 4 : Mémoire – Parties de l'ordinateur</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">Retrouve chaque image et son nom en les associant deux par deux !</p>
+
+    <div class="score-bar"><div class="score-fill" id="j4-bar" style="width:0%"></div></div>
+    <div class="score-text" id="j4-score">0 paires trouvées</div>
+    <div class="gap"></div>
+
+    <div class="memory-grid" id="j4-grid"></div>
+
+    <div class="center mt">
+      <button class="btn btn-gray" onclick="resetJeu4()">🔄 Mélanger</button>
+      <span style="display:inline-block;width:10px"></span>
+      <button class="btn btn-green" onclick="showSection('activites')">Activités →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ACTIVITÉS ===== -->
+<div class="section" id="activites">
+  <div class="card">
+    <div class="card-title">💬 Questions / Réponses orales</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:12px;">Appuie sur une question pour voir la réponse.</p>
+    <div id="qa-container"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✏️ Complète les phrases</div>
+    <div class="score-bar"><div class="score-fill" id="phrases-bar" style="width:0%"></div></div>
+    <div class="score-text" id="phrases-score">0 / 5</div>
+    <div class="gap"></div>
+    <div id="phrases-container"></div>
+    <div class="center mt">
+      <button class="btn btn-gray" onclick="resetPhrases()">🔄 Recommencer</button>
+    </div>
+  </div>
+
+  <div class="card center">
+    <div class="card-title" style="justify-content:center">🏆 Bravo !</div>
+    <div style="font-size:40px;margin:10px 0">🌟</div>
+    <p style="font-size:15px;font-weight:600;color:var(--gray)">Tu as terminé toutes les activités de la leçon sur <strong>Les Moyens de Communication</strong> !</p>
+    <div class="gap"></div>
+    <button class="btn btn-blue" onclick="showSection('objectifs')">🔄 Revoir les objectifs</button>
+  </div>
+</div>
+
+<script>
+// ===== NAV =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx = ['objectifs','lecon','jeu1','jeu2','jeu3','jeu4','activites'].indexOf(id);
+  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ===== LEÇON – PARTS =====
+function togglePart(el, text) {
+  document.querySelectorAll('.part-card').forEach(c => c.style.borderColor = '#e0e7ff');
+  el.style.borderColor = 'var(--blue)';
+  const info = document.getElementById('part-info');
+  info.style.display = 'block';
+  info.textContent = text;
+}
+
+// ===== JEU 1 : MATCH =====
+let j1Selected = {left: null, right: null};
+let j1Score = 0;
+
+function selectMatch(el, side, id) {
+  if (el.classList.contains('correct') || el.classList.contains('disabled')) return;
+  
+  // Deselect previous on same side
+  document.querySelectorAll('.match-item').forEach(m => {
+    if (!m.classList.contains('correct')) m.classList.remove('selected');
+  });
+
+  if (j1Selected[side] === el) { j1Selected[side] = null; return; }
+  
+  el.classList.add('selected');
+  j1Selected[side] = el;
+  j1Selected[side]._id = id;
+
+  if (j1Selected.left && j1Selected.right) {
+    const lid = j1Selected.left._id, rid = j1Selected.right._id;
+    if (lid === rid) {
+      j1Selected.left.classList.remove('selected'); j1Selected.left.classList.add('correct');
+      j1Selected.right.classList.remove('selected'); j1Selected.right.classList.add('correct');
+      j1Score++;
+      updateJ1();
+    } else {
+      j1Selected.left.classList.add('wrong'); j1Selected.right.classList.add('wrong');
+      const l = j1Selected.left, r = j1Selected.right;
+      setTimeout(() => {
+        l.classList.remove('selected','wrong'); r.classList.remove('selected','wrong');
+      }, 800);
+    }
+    j1Selected = {left: null, right: null};
+  }
+}
+
+function updateJ1() {
+  document.getElementById('j1-score').textContent = j1Score + ' / 6';
+  document.getElementById('j1-bar').style.width = (j1Score / 6 * 100) + '%';
+}
+
+function resetJeu1() {
+  j1Score = 0; j1Selected = {left: null, right: null};
+  document.querySelectorAll('.match-item').forEach(m => m.className = 'match-item');
+  updateJ1();
+}
+
+// ===== JEU 2 : VRAI/FAUX =====
+const j2Questions = [
+  { q: "Internet est un réseau mondial qui relie des ordinateurs.", ans: true },
+  { q: "L'écran sert à taper du texte.", ans: false, exp: "C'est le clavier qui sert à taper." },
+  { q: "On peut utiliser Internet pour envoyer des e-mails.", ans: true },
+  { q: "Internet n'a aucun méfait sur les enfants.", ans: false, exp: "Internet peut être dangereux (dépendance, fausses informations…)." },
+  { q: "La souris permet de déplacer le curseur.", ans: true },
+  { q: "Regarder des films sur Internet s'appelle le streaming.", ans: true },
+  { q: "L'unité centrale est le cerveau de l'ordinateur.", ans: true },
+  { q: "Internet ne peut pas aider à apprendre des choses nouvelles.", ans: false, exp: "Internet permet d'apprendre en ligne !" },
+];
+let j2Score = 0;
+let j2Answers = [];
+
+function buildJ2() {
+  const cont = document.getElementById('j2-container');
+  cont.innerHTML = '';
+  const dots = document.getElementById('j2-dots');
+  dots.innerHTML = '';
+  j2Questions.forEach((q, i) => {
+    const d = document.createElement('div'); d.className = 'dot'; dots.appendChild(d);
+    const box = document.createElement('div'); box.className = 'quiz-question'; box.id = 'q2-'+i;
+    box.innerHTML = `<p>${i+1}. ${q.q}</p>
+      <div class="vf-btns">
+        <button class="vf-btn vrai" onclick="answerJ2(${i}, true)">✅ Vrai</button>
+        <button class="vf-btn faux" onclick="answerJ2(${i}, false)">❌ Faux</button>
+      </div>
+      <div id="fb2-${i}"></div>`;
+    cont.appendChild(box);
+  });
+  updateDots2();
+}
+
+function answerJ2(i, ans) {
+  if (j2Answers[i] !== undefined) return;
+  j2Answers[i] = ans;
+  const q = j2Questions[i];
+  const correct = ans === q.ans;
+  if (correct) j2Score++;
+  
+  const btns = document.querySelectorAll('#q2-'+i+' .vf-btn');
+  btns.forEach(b => { b.disabled = true; });
+  
+  if (ans) btns[0].classList.add(correct ? 'correct' : 'incorrect');
+  else btns[1].classList.add(correct ? 'correct' : 'incorrect');
+  
+  const fb = document.getElementById('fb2-'+i);
+  if (correct) fb.innerHTML = '<span class="feedback ok">✅ Bravo !</span>';
+  else fb.innerHTML = `<span class="feedback ko">❌ ${q.exp || 'Pas tout à fait !'}</span>`;
+
+  updateJ2();
+  updateDots2();
+}
+
+function updateJ2() {
+  document.getElementById('j2-score').textContent = j2Score + ' / 8';
+  document.getElementById('j2-bar').style.width = (j2Score / 8 * 100) + '%';
+}
+
+function updateDots2() {
+  document.querySelectorAll('#j2-dots .dot').forEach((d, i) => {
+    d.className = 'dot';
+    if (j2Answers[i] !== undefined) d.classList.add('done');
+  });
+}
+
+function resetJeu2() {
+  j2Score = 0; j2Answers = [];
+  updateJ2();
+  buildJ2();
+}
+
+// ===== JEU 3 : CLASSEMENT =====
+const j3Items = [
+  { label: "Apprendre en ligne", bien: true },
+  { label: "Communiquer vite", bien: true },
+  { label: "Trouver des informations", bien: true },
+  { label: "Se divertir", bien: true },
+  { label: "Dépendance au téléphone", bien: false },
+  { label: "Fausses informations", bien: false },
+  { label: "Dangers en ligne", bien: false },
+  { label: "Fatigue des yeux", bien: false },
+];
+let j3Selected = null;
+let j3Score = 0;
+let j3Placed = {};
+
+function buildJ3() {
+  const cards = document.getElementById('j3-cards');
+  cards.innerHTML = '';
+  j3Items.forEach((item, i) => {
+    if (j3Placed[i]) return;
+    const el = document.createElement('div');
+    el.className = 'sort-card';
+    el.textContent = item.label;
+    el.onclick = () => selectJ3(i, item, el);
+    el.id = 'j3-card-'+i;
+    cards.appendChild(el);
+  });
+}
+
+function selectJ3(i, item, el) {
+  j3Selected = {i, item};
+  document.getElementById('j3-picker').style.display = 'block';
+  document.getElementById('j3-picker-label').textContent = '"' + item.label + '"';
+  document.querySelectorAll('.sort-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function placeItem(isBien) {
+  if (!j3Selected) return;
+  const {i, item} = j3Selected;
+  const correct = isBien === item.bien;
+  if (correct) j3Score++;
+
+  const binEl = document.getElementById(isBien ? 'bin-bien' : 'bin-mal');
+  const placed = document.createElement('div');
+  placed.className = 'placed-item';
+  placed.style.background = correct ? (isBien ? '#e6f4ea' : '#fce8e6') : '#fff3cd';
+  placed.style.color = correct ? (isBien ? 'var(--green)' : 'var(--red)') : 'var(--orange)';
+  placed.innerHTML = (correct ? '✓ ' : '⚠️ ') + item.label;
+  binEl.appendChild(placed);
+
+  j3Placed[i] = true;
+  document.getElementById('j3-picker').style.display = 'none';
+  j3Selected = null;
+  buildJ3();
+  updateJ3();
+}
+
+function updateJ3() {
+  const total = Object.keys(j3Placed).length;
+  document.getElementById('j3-score').textContent = j3Score + ' / ' + total;
+  document.getElementById('j3-bar').style.width = (j3Score / 8 * 100) + '%';
+}
+
+function resetJeu3() {
+  j3Score = 0; j3Placed = {}; j3Selected = null;
+  document.getElementById('bin-bien').innerHTML = '';
+  document.getElementById('bin-mal').innerHTML = '';
+  document.getElementById('j3-picker').style.display = 'none';
+  updateJ3();
+  buildJ3();
+}
+
+// ===== JEU 4 : MÉMOIRE =====
+const j4Pairs = [
+  { emoji: '🖥️', label: 'Écran' },
+  { emoji: '⌨️', label: 'Clavier' },
+  { emoji: '🖱️', label: 'Souris' },
+  { emoji: '🔊', label: 'Haut-parleur' },
+  { emoji: '🖨️', label: 'Imprimante' },
+  { emoji: '💾', label: 'Unité centrale' },
+];
+let j4Flipped = [], j4Matched = 0, j4Cards = [], j4Lock = false;
+
+function buildJ4() {
+  const grid = document.getElementById('j4-grid');
+  grid.innerHTML = '';
+  j4Matched = 0; j4Flipped = []; j4Lock = false;
+  updateJ4();
+
+  // Create pairs: one emoji card, one label card
+  let tiles = [];
+  j4Pairs.forEach((p, i) => {
+    tiles.push({ id: i, type: 'emoji', content: p.emoji, label: p.label });
+    tiles.push({ id: i, type: 'label', content: p.label, label: p.label });
+  });
+  // Shuffle
+  tiles.sort(() => Math.random() - 0.5);
+  j4Cards = tiles;
+
+  tiles.forEach((t, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mem-card';
+    card.innerHTML = `
+      <div class="mem-front">❓</div>
+      <div class="mem-back">
+        <div class="back-emoji">${t.type === 'emoji' ? t.content : '🔤'}</div>
+        <div class="back-label">${t.type === 'label' ? t.content : t.label}</div>
+      </div>`;
+    card.onclick = () => flipCard(card, idx);
+    grid.appendChild(card);
+  });
+}
+
+function flipCard(card, idx) {
+  if (j4Lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  card.classList.add('flipped');
+  j4Flipped.push({card, idx});
+
+  if (j4Flipped.length === 2) {
+    j4Lock = true;
+    const [a, b] = j4Flipped;
+    if (j4Cards[a.idx].id === j4Cards[b.idx].id && a.idx !== b.idx) {
+      a.card.classList.add('matched'); b.card.classList.add('matched');
+      j4Matched++;
+      updateJ4();
+      j4Flipped = []; j4Lock = false;
+    } else {
+      setTimeout(() => {
+        a.card.classList.remove('flipped'); b.card.classList.remove('flipped');
+        j4Flipped = []; j4Lock = false;
+      }, 900);
+    }
+  }
+}
+
+function updateJ4() {
+  document.getElementById('j4-score').textContent = j4Matched + ' paires trouvées sur 6';
+  document.getElementById('j4-bar').style.width = (j4Matched / 6 * 100) + '%';
+}
+
+function resetJeu4() { buildJ4(); }
+
+// ===== Q&R =====
+const qaData = [
+  { q: "Qu'est-ce qu'Internet ?", a: "Internet est un grand réseau mondial qui relie des millions d'ordinateurs entre eux pour permettre d'échanger des informations et de communiquer." },
+  { q: "Cite 3 utilisations d'Internet.", a: "On peut utiliser Internet pour : 1) envoyer des e-mails, 2) faire des recherches, 3) regarder des films ou écouter de la musique." },
+  { q: "Nomme 3 parties de l'ordinateur.", a: "L'ordinateur est composé d'un écran, d'un clavier, d'une souris, d'une unité centrale, de haut-parleurs et d'une imprimante." },
+  { q: "Cite un bienfait d'Internet.", a: "Un bienfait d'Internet est qu'il permet d'accéder facilement à des informations et d'apprendre en ligne." },
+  { q: "Cite un méfait d'Internet.", a: "Un méfait d'Internet est la dépendance : passer trop de temps sur Internet peut être néfaste pour la santé et la concentration." },
+];
+
+function buildQA() {
+  const cont = document.getElementById('qa-container');
+  cont.innerHTML = '';
+  qaData.forEach((qa, i) => {
+    const el = document.createElement('div');
+    el.className = 'qa-item';
+    el.innerHTML = `<div class="qa-question">${qa.q} <span class="qa-arrow">›</span></div>
+      <div class="qa-answer">${qa.a}</div>`;
+    el.onclick = () => el.classList.toggle('open');
+    cont.appendChild(el);
+  });
+}
+
+// ===== PHRASES =====
+const phrasesData = [
+  { before: "Internet est un grand ", blank: "réseau", after: " mondial.", options: ["réseau", "pays", "livre"] },
+  { before: "Le ", blank: "clavier", after: " sert à taper du texte.", options: ["clavier", "écran", "souris"] },
+  { before: "On peut envoyer des ", blank: "e-mails", after: " grâce à Internet.", options: ["e-mails", "lettres", "colis"] },
+  { before: "La ", blank: "souris", after: " permet de déplacer le curseur.", options: ["souris", "imprimante", "clavier"] },
+  { before: "La dépendance est un ", blank: "méfait", after: " d'Internet.", options: ["méfait", "bienfait", "usage"] },
+];
+let phrasesScore = 0;
+let phrasesAnswered = {};
+
+function buildPhrases() {
+  const cont = document.getElementById('phrases-container');
+  cont.innerHTML = '';
+  phrasesData.forEach((p, i) => {
+    const el = document.createElement('div');
+    el.className = 'phrase-item';
+    const opts = [...p.options].sort(() => Math.random() - 0.5);
+    el.innerHTML = `<div class="phrase-text">${p.before}<span class="blank" id="blank-${i}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>${p.after}</div>
+      <div class="phrase-options">
+        ${opts.map(o => `<button class="phrase-opt" onclick="answerPhrase(${i},'${o}',this)">${o}</button>`).join('')}
+      </div>`;
+    cont.appendChild(el);
+  });
+}
+
+function answerPhrase(i, ans, btn) {
+  if (phrasesAnswered[i]) return;
+  phrasesAnswered[i] = true;
+  const correct = ans === phrasesData[i].blank;
+  if (correct) phrasesScore++;
+  document.getElementById('blank-'+i).textContent = ans;
+  document.getElementById('blank-'+i).style.color = correct ? 'var(--green)' : 'var(--red)';
+  document.getElementById('blank-'+i).style.borderColor = correct ? 'var(--green)' : 'var(--red)';
+  btn.classList.add(correct ? 'correct-answer' : 'wrong-answer');
+  // disable all options for this phrase
+  btn.parentElement.querySelectorAll('.phrase-opt').forEach(b => b.classList.add('used'));
+  if (!correct) {
+    btn.parentElement.querySelectorAll('.phrase-opt').forEach(b => {
+      if (b.textContent === phrasesData[i].blank) b.classList.remove('used'), b.classList.add('correct-answer');
+    });
+  }
+  updatePhrases();
+}
+
+function updatePhrases() {
+  const total = Object.keys(phrasesAnswered).length;
+  document.getElementById('phrases-score').textContent = phrasesScore + ' / 5';
+  document.getElementById('phrases-bar').style.width = (phrasesScore / 5 * 100) + '%';
+}
+
+function resetPhrases() {
+  phrasesScore = 0; phrasesAnswered = {};
+  updatePhrases();
+  buildPhrases();
+}
+
+// ===== INIT =====
+buildJ2();
+buildJ3();
+buildJ4();
+buildQA();
+buildPhrases();
+</script>
+</body>
+</html>

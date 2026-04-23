@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مغامرة القسمة الفضائية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #e8f4fd;
+  --bg2:     #ffffff;
+  --bg3:     #f0f7ff;
+  --card:    #ffffff;
+  --border:  #c5dff7;
+  --accent:  #2196f3;
+  --yellow:  #ff9800;
+  --green:   #00c853;
+  --pink:    #e91e8c;
+  --purple:  #7c3aed;
+  --orange:  #ff5722;
+  --teal:    #009688;
+  --text:    #1a2a4a;
+  --muted:   #5a7a9a;
+  --shadow:  0 4px 20px rgba(33,150,243,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* ── Animated sky background ── */
+#stars-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Layout ── */
+#app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Header ── */
+header {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 8px;
+}
+
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-icon { font-size: 24px; }
+.logo-text {
+  font-size: 16px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #2196f3, #e91e8c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stats { display: flex; gap: 12px; align-items: center; }
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(33,150,243,0.12);
+}
+.stat-badge .icon { font-size: 15px; }
+.stat-badge .val { color: var(--orange); font-weight: 900; }
+
+/* ── Level dots ── */
+.level-bar {
+  width: 100%;
+  max-width: 800px;
+  padding: 0 20px 14px;
+}
+.level-dots { display: flex; gap: 8px; justify-content: center; }
+.level-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #cde4f7;
+  border: 2px solid #b0d0ec;
+  transition: all 0.3s;
+}
+.level-dot.done {
+  background: var(--green);
+  border-color: #00a844;
+  box-shadow: 0 0 6px rgba(0,200,83,0.4);
+}
+.level-dot.current {
+  background: var(--accent);
+  border-color: #1565c0;
+  box-shadow: 0 0 10px rgba(33,150,243,0.5);
+  transform: scale(1.3);
+}
+
+/* ── Main game card ── */
+.game-card {
+  width: 100%;
+  max-width: 800px;
+  background: #fff;
+  border: 2.5px solid var(--border);
+  border-radius: 28px;
+  padding: 24px 24px 28px;
+  margin: 0 12px;
+  box-shadow: 0 8px 32px rgba(33,150,243,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #2196f3, #e91e8c, #ff9800, #00c853, #7c3aed);
+  border-radius: 28px 28px 0 0;
+}
+
+/* ── Equation ── */
+.equation-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  background: #f0f7ff;
+  border-radius: 18px;
+  padding: 14px 20px;
+  border: 2px solid #c5dff7;
+}
+
+.eq-num {
+  font-size: 44px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+}
+.eq-div {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--muted);
+  line-height: 1;
+}
+.eq-result {
+  font-size: 44px;
+  font-weight: 900;
+  line-height: 1;
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.eq-result.hidden-num {
+  color: #b0c8e0;
+  background: #e8f4fd;
+  border: 3px dashed #90caf9;
+  border-radius: 12px;
+  padding: 0 16px;
+  min-width: 70px;
+  text-align: center;
+}
+.eq-result.revealed {
+  color: var(--green);
+  background: none;
+  border: none;
+  padding: 0;
+  animation: revealPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes revealPop {
+  0% { transform: scale(0.5) rotate(-10deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.question-hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ── Items pool ── */
+.items-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+}
+
+.items-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  min-height: 68px;
+  background: #f0f7ff;
+  border: 2.5px dashed #90caf9;
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 20px;
+  transition: all 0.3s;
+}
+
+.space-item {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: #fff;
+  border: 2.5px solid #b0d4f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 3px 10px rgba(33,150,243,0.12);
+}
+.space-item:hover {
+  transform: translateY(-5px) scale(1.12);
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px rgba(33,150,243,0.25);
+}
+.space-item.selected {
+  border-color: var(--orange);
+  background: #fff8e1;
+  box-shadow: 0 0 0 4px rgba(255,152,0,0.25);
+  transform: scale(1.15) translateY(-3px);
+}
+.space-item.placed {
+  opacity: 0.25;
+  pointer-events: none;
+  transform: scale(0.85);
+  filter: grayscale(0.5);
+}
+
+@keyframes flyToSlot {
+  0%  { transform: scale(1.15); }
+  50% { transform: scale(1.35) translateY(-12px); }
+  100%{ transform: scale(0.7); opacity: 0; }
+}
+
+/* ── Ships ── */
+.ships-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ship-slot {
+  background: #f8fbff;
+  border: 2.5px solid #b0d4f7;
+  border-radius: 20px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+  transition: all 0.25s;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(33,150,243,0.1);
+}
+.ship-slot:hover {
+  border-color: var(--accent);
+  background: #e3f2fd;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(33,150,243,0.2);
+}
+.ship-slot.accepting {
+  border-color: var(--orange);
+  background: #fff8e1;
+  box-shadow: 0 0 0 4px rgba(255,152,0,0.2), 0 6px 20px rgba(255,152,0,0.15);
+  transform: translateY(-3px) scale(1.04);
+}
+.ship-slot.complete {
+  border-color: var(--green);
+  background: #e8faf0;
+  box-shadow: 0 0 0 4px rgba(0,200,83,0.2), 0 6px 20px rgba(0,200,83,0.15);
+}
+.ship-slot.wrong {
+  border-color: var(--pink);
+  background: #fce4ec;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%  { transform: translateX(-7px) rotate(-2deg); }
+  75%  { transform: translateX(7px) rotate(2deg); }
+}
+
+.ship-emoji { font-size: 32px; line-height: 1; }
+
+.ship-count {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--muted);
+  background: #e8f0f8;
+  border-radius: 99px;
+  padding: 3px 12px;
+  min-width: 38px;
+  text-align: center;
+  transition: all 0.3s;
+  border: 1.5px solid #c5d8ee;
+}
+.ship-count.has-items { color: var(--accent); background: #e3f2fd; border-color: #90caf9; }
+.ship-count.full      { color: #fff; background: var(--green); border-color: #00a844; }
+
+.ship-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+  min-height: 28px;
+  max-width: 120px;
+}
+.ship-item-placed {
+  font-size: 17px;
+  line-height: 1;
+  animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { transform: scale(0) rotate(-25deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0);      opacity: 1; }
+}
+
+/* ── Feedback ── */
+.feedback {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 16px;
+  min-height: 24px;
+  padding: 6px 16px;
+  border-radius: 99px;
+  transition: all 0.3s;
+}
+.feedback.success {
+  color: #fff;
+  background: var(--green);
+  box-shadow: 0 4px 16px rgba(0,200,83,0.35);
+}
+.feedback.error {
+  color: #fff;
+  background: var(--pink);
+  box-shadow: 0 4px 16px rgba(233,30,140,0.3);
+}
+
+/* ── Screens ── */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 800px;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 12px;
+}
+.screen.active { display: flex; }
+
+/* ── Intro ── */
+.intro-logo {
+  font-size: 72px;
+  margin-top: 36px;
+  filter: drop-shadow(0 6px 18px rgba(33,150,243,0.3));
+  animation: floatRocket 2.8s ease-in-out infinite;
+}
+@keyframes floatRocket {
+  0%,100% { transform: translateY(0) rotate(-6deg); }
+  50%      { transform: translateY(-16px) rotate(6deg); }
+}
+.intro-title {
+  font-size: 34px;
+  font-weight: 900;
+  text-align: center;
+  margin: 16px 0 8px;
+  background: linear-gradient(135deg, #2196f3, #7c3aed, #e91e8c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+.intro-sub {
+  text-align: center;
+  color: var(--muted);
+  font-size: 17px;
+  max-width: 380px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+  font-weight: 500;
+}
+.btn-start {
+  background: linear-gradient(135deg, #2196f3, #7c3aed);
+  border: none;
+  color: #fff;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  padding: 16px 56px;
+  border-radius: 99px;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(33,150,243,0.4);
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.btn-start:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 14px 40px rgba(33,150,243,0.5);
+}
+.btn-start:active { transform: scale(0.97); }
+
+/* ── Final ── */
+.success-screen {
+  text-align: center;
+  padding: 36px 28px;
+  background: #fff;
+  border: 2.5px solid var(--border);
+  border-radius: 28px;
+  width: 100%;
+  box-shadow: 0 8px 40px rgba(33,150,243,0.14);
+  overflow: hidden;
+  position: relative;
+}
+.success-screen::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 7px;
+  background: linear-gradient(90deg, #2196f3, #e91e8c, #ff9800, #00c853, #7c3aed);
+}
+.success-icon { font-size: 60px; margin-bottom: 12px; margin-top: 4px; }
+.success-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+.final-title {
+  font-size: 30px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--orange), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.final-score {
+  font-size: 60px;
+  font-weight: 900;
+  color: var(--orange);
+  margin: 10px 0;
+  text-align: center;
+}
+.stars-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 8px 0 20px;
+  font-size: 36px;
+}
+
+/* ── Confetti ── */
+.confetti-piece {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── Divider ── */
+.divider {
+  width: 100%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 14px 0;
+}
+
+.progress-label {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.btn-mini {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border: none;
+  color: #fff;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 9px 28px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 12px;
+  box-shadow: 0 4px 14px rgba(33,150,243,0.3);
+}
+.btn-mini:hover { transform: scale(1.06); }
+</style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+
+<div id="app">
+
+  <!-- ══ INTRO SCREEN ══ -->
+  <div id="screen-intro" class="screen active" style="min-height:100vh;justify-content:center;padding-top:0;">
+    <div class="intro-logo">🚀</div>
+    <h1 class="intro-title">مغامرة القسمة الفضائية</h1>
+    <p class="intro-sub">وزّع البضائع الفضائية على المركبات بالتساوي<br>وتعلّم القسمة بطريقة ممتعة!</p>
+    <button class="btn-start" onclick="startGame()">انطلق! 🌟</button>
+    <div style="margin-top:28px;display:flex;gap:24px;color:var(--muted);font-size:13px;">
+      <span>⭐ ٥ مستويات</span>
+      <span>🧠 قسمة مرئية</span>
+      <span>🎯 نقاط وجوائز</span>
+    </div>
+  </div>
+
+  <!-- ══ GAME SCREEN ══ -->
+  <div id="screen-game" class="screen" style="padding-top:0;gap:0;">
+    <header>
+      <div class="logo">
+        <span class="logo-icon">🚀</span>
+        <span class="logo-text">القسمة الفضائية</span>
+      </div>
+      <div class="stats">
+        <div class="stat-badge"><span class="icon">⭐</span><span class="val" id="score-display">0</span></div>
+        <div class="stat-badge"><span class="icon">🎯</span><span id="level-display">1/5</span></div>
+      </div>
+    </header>
+
+    <div class="level-bar">
+      <div class="level-dots" id="level-dots"></div>
+    </div>
+
+    <div class="game-card" id="game-card">
+      <!-- equation -->
+      <div class="equation-row">
+        <span class="eq-num" id="eq-total"></span>
+        <span class="eq-div">÷</span>
+        <span class="eq-num" id="eq-div-num"></span>
+        <span class="eq-div">=</span>
+        <span class="eq-result hidden-num" id="eq-result">?</span>
+      </div>
+
+      <p class="question-hint" id="q-hint">انقر على عنصر ثم انقر على المركبة</p>
+
+      <div class="items-label">البضائع المتاحة</div>
+      <div class="items-pool" id="items-pool"></div>
+
+      <div class="items-label">المركبات الفضائية</div>
+      <div class="ships-row" id="ships-row"></div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- ══ FINAL SCREEN ══ -->
+  <div id="screen-final" class="screen" style="min-height:100vh;justify-content:center;padding-top:0;">
+    <div class="success-screen">
+      <div class="success-icon">🏆</div>
+      <div class="final-title">أنجزت كل المغامرات!</div>
+      <div class="stars-row" id="final-stars"></div>
+      <div style="color:var(--muted);font-size:15px;margin-bottom:8px;">مجموع نقاطك</div>
+      <div class="final-score" id="final-score-display">0</div>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">أنت قائد فضائي ممتاز! 🚀<br>الآن تفهم القسمة بعمق 🧠</p>
+      <button class="btn-start" onclick="restartGame()">العب مجدداً 🔄</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   SKY BACKGROUND — floating bubbles & sparkles
+═══════════════════════════════════════════════ */
+(function(){
+  const c = document.getElementById('stars-canvas');
+  const ctx = c.getContext('2d');
+  const COLORS = ['rgba(33,150,243,0.08)','rgba(233,30,140,0.07)','rgba(255,152,0,0.07)','rgba(0,200,83,0.07)','rgba(124,58,237,0.07)'];
+  let blobs = [];
+  function resize(){ c.width=innerWidth; c.height=innerHeight; }
+  function init(){
+    blobs=[];
+    for(let i=0;i<28;i++) blobs.push({
+      x:Math.random()*c.width, y:Math.random()*c.height,
+      r:Math.random()*55+20,
+      vx:(Math.random()-0.5)*0.25,
+      vy:(Math.random()-0.5)*0.18,
+      color:COLORS[Math.floor(Math.random()*COLORS.length)],
+      a:Math.random()*0.6+0.4, da:Math.random()*0.003+0.001
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    blobs.forEach(b=>{
+      b.x+=b.vx; b.y+=b.vy;
+      b.a+=b.da; if(b.a>1||b.a<0.2) b.da*=-1;
+      if(b.x<-b.r) b.x=c.width+b.r;
+      if(b.x>c.width+b.r) b.x=-b.r;
+      if(b.y<-b.r) b.y=c.height+b.r;
+      if(b.y>c.height+b.r) b.y=-b.r;
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+      ctx.fillStyle=b.color;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{ resize(); init(); });
+  resize(); init(); draw();
+})();
+
+/* ═══════════════════════════════════════════════
+   GAME DATA
+═══════════════════════════════════════════════ */
+const LEVELS = [
+  { total:6,  div:2, emoji:'🌟', ship:'🚀', msg:'وزّع 6 نجوم على مركبتين بالتساوي!' },
+  { total:9,  div:3, emoji:'🪐', ship:'🛸', msg:'وزّع 9 كواكب على 3 مركبات بالتساوي!' },
+  { total:8,  div:4, emoji:'🌙', ship:'🛰️', msg:'وزّع 8 أقمار على 4 مركبات بالتساوي!' },
+  { total:12, div:3, emoji:'☄️', ship:'🚀', msg:'وزّع 12 نيزكاً على 3 مركبات بالتساوي!' },
+  { total:15, div:5, emoji:'💫', ship:'🛸', msg:'وزّع 15 شهاباً على 5 مركبات بالتساوي!' },
+];
+
+const ARABIC_NUMS = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'];
+
+let currentLevel = 0;
+let totalScore   = 0;
+let selectedItem = null;
+let shipsData    = []; // array of { count, max }
+
+/* ═══════════════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════════════ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+
+function startGame(){
+  currentLevel = 0;
+  totalScore   = 0;
+  document.getElementById('score-display').textContent = '0';
+  showScreen('game');
+  loadLevel();
+}
+
+function restartGame(){ startGame(); }
+
+/* ═══════════════════════════════════════════════
+   LEVEL LOADER
+═══════════════════════════════════════════════ */
+function loadLevel(){
+  const lvl = LEVELS[currentLevel];
+  selectedItem = null;
+
+  // Level dots
+  const dotsEl = document.getElementById('level-dots');
+  dotsEl.innerHTML = '';
+  LEVELS.forEach((_,i)=>{
+    const d = document.createElement('div');
+    d.className = 'level-dot' + (i<currentLevel?' done':i===currentLevel?' current':'');
+    dotsEl.appendChild(d);
+  });
+
+  // Header
+  document.getElementById('level-display').textContent = (currentLevel+1)+'/5';
+
+  // Equation
+  document.getElementById('eq-total').textContent = ARABIC_NUMS[lvl.total];
+  document.getElementById('eq-div-num').textContent = ARABIC_NUMS[lvl.div];
+  const resEl = document.getElementById('eq-result');
+  resEl.textContent = '?';
+  resEl.className = 'eq-result hidden-num';
+
+  // Hint
+  document.getElementById('q-hint').textContent = lvl.msg;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+
+  // Items pool
+  const pool = document.getElementById('items-pool');
+  pool.innerHTML = '';
+  for(let i=0;i<lvl.total;i++){
+    const it = document.createElement('div');
+    it.className = 'space-item';
+    it.dataset.index = i;
+    it.textContent = lvl.emoji;
+    it.addEventListener('click', ()=>selectItem(it));
+    pool.appendChild(it);
+  }
+
+  // Ships
+  const expectedPerShip = lvl.total / lvl.div;
+  shipsData = [];
+  const shipsEl = document.getElementById('ships-row');
+  shipsEl.innerHTML = '';
+  for(let i=0;i<lvl.div;i++){
+    shipsData.push({ count:0, max: expectedPerShip });
+    const ship = document.createElement('div');
+    ship.className = 'ship-slot';
+    ship.dataset.shipIndex = i;
+    ship.innerHTML = `
+      <div class="ship-emoji">${lvl.ship}</div>
+      <div class="ship-items" id="ship-items-${i}"></div>
+      <div class="ship-count" id="ship-count-${i}">0</div>
+    `;
+    ship.addEventListener('click', ()=>placeItemInShip(i));
+    shipsEl.appendChild(ship);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   ITEM SELECTION
+═══════════════════════════════════════════════ */
+function selectItem(el){
+  if(el.classList.contains('placed')) return;
+  // deselect previous
+  document.querySelectorAll('.space-item.selected').forEach(s=>s.classList.remove('selected'));
+  if(selectedItem === el){
+    selectedItem = null;
+    setFeedback('','');
+    return;
+  }
+  selectedItem = el;
+  el.classList.add('selected');
+  setFeedback('اختر المركبة التي تريد وضعه فيها 👇','');
+  // highlight ships
+  document.querySelectorAll('.ship-slot').forEach(s=>s.classList.add('accepting'));
+}
+
+/* ═══════════════════════════════════════════════
+   PLACE ITEM
+═══════════════════════════════════════════════ */
+function placeItemInShip(shipIndex){
+  if(!selectedItem) {
+    setFeedback('أولاً اختر عنصراً من البضائع 👆','error');
+    return;
+  }
+  const lvl = LEVELS[currentLevel];
+  const sd  = shipsData[shipIndex];
+  if(sd.count >= sd.max){
+    // overfilled
+    const ship = document.querySelector(`[data-ship-index="${shipIndex}"]`);
+    ship.classList.add('wrong');
+    setTimeout(()=>ship.classList.remove('wrong'),500);
+    setFeedback(`هذه المركبة ممتلئة! جرّب مركبة أخرى 🚫`,'error');
+    return;
+  }
+
+  // Place it
+  selectedItem.classList.remove('selected');
+  selectedItem.classList.add('placed');
+  selectedItem = null;
+
+  document.querySelectorAll('.ship-slot').forEach(s=>s.classList.remove('accepting'));
+
+  sd.count++;
+  const countEl = document.getElementById(`ship-count-${shipIndex}`);
+  countEl.textContent = ARABIC_NUMS[sd.count];
+  countEl.className = sd.count===sd.max ? 'ship-count full' : 'ship-count has-items';
+
+  const itemsEl = document.getElementById(`ship-items-${shipIndex}`);
+  const mini = document.createElement('span');
+  mini.className = 'ship-item-placed';
+  mini.textContent = lvl.emoji;
+  itemsEl.appendChild(mini);
+
+  // Mark ship complete
+  if(sd.count === sd.max){
+    document.querySelector(`[data-ship-index="${shipIndex}"]`).classList.add('complete');
+  }
+
+  setFeedback('','');
+  checkWin();
+}
+
+/* ═══════════════════════════════════════════════
+   WIN CHECK
+═══════════════════════════════════════════════ */
+function checkWin(){
+  const allFull = shipsData.every(s=>s.count===s.max);
+  if(!allFull) return;
+
+  const lvl = LEVELS[currentLevel];
+  const answer = lvl.total / lvl.div;
+
+  // Reveal answer
+  const resEl = document.getElementById('eq-result');
+  resEl.textContent = ARABIC_NUMS[answer];
+  resEl.className = 'eq-result revealed';
+
+  const pts = 100 + currentLevel * 20;
+  totalScore += pts;
+  document.getElementById('score-display').textContent = totalScore;
+
+  setFeedback(`🎉 أحسنت! ${ARABIC_NUMS[lvl.total]} ÷ ${ARABIC_NUMS[lvl.div]} = ${ARABIC_NUMS[answer]}`,'success');
+  spawnConfetti();
+
+  setTimeout(()=>{
+    if(currentLevel < LEVELS.length - 1){
+      currentLevel++;
+      loadLevel();
+    } else {
+      showFinal();
+    }
+  }, 2400);
+}
+
+/* ═══════════════════════════════════════════════
+   FINAL SCREEN
+═══════════════════════════════════════════════ */
+function showFinal(){
+  document.getElementById('final-score-display').textContent = totalScore;
+  const stars = totalScore >= 700 ? 3 : totalScore >= 450 ? 2 : 1;
+  document.getElementById('final-stars').innerHTML = '⭐'.repeat(stars) + (stars<3?'🌑'.repeat(3-stars):'');
+  showScreen('final');
+  spawnConfetti(120);
+}
+
+/* ═══════════════════════════════════════════════
+   FEEDBACK
+═══════════════════════════════════════════════ */
+function setFeedback(msg, type){
+  const el = document.getElementById('feedback');
+  el.textContent = msg;
+  el.className = 'feedback' + (type?' '+type:'');
+}
+
+/* ═══════════════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════════════ */
+const CONF_COLORS = ['#2196f3','#e91e8c','#ff9800','#00c853','#7c3aed','#ff5722','#ffeb3b','#00bcd4'];
+function spawnConfetti(count=50){
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left:${Math.random()*100}vw;
+        top:-10px;
+        background:${CONF_COLORS[Math.floor(Math.random()*CONF_COLORS.length)]};
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+        width:${Math.random()*8+5}px;
+        height:${Math.random()*8+5}px;
+        animation-duration:${Math.random()*1.5+1.2}s;
+        animation-delay:${Math.random()*0.5}s;
+      `;
+      document.body.appendChild(el);
+      el.addEventListener('animationend',()=>el.remove());
+    }, i * 18);
+  }
+}
+</script>
+</body>
+</html>

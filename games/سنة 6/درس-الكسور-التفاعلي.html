@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ضرب عدد كسري في عدد صحيح</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #FF6B35;
+    --secondary: #4ECDC4;
+    --accent: #FFD93D;
+    --dark: #FFF8DC;
+    --mid: #F0F8FF;
+    --light: #E6F3FF;
+    --success: #047857;
+    --error: #C0152F;
+    --white: #1A2535;
+    --card-bg: rgba(255,255,255,0.85);
+    --text-main: #1A2535;
+    --text-soft: #374151;
+    --text-muted: #6B7280;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Light background soft blobs */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: 
+      radial-gradient(ellipse at 15% 20%, rgba(212,64,0,0.08) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 80%, rgba(10,138,130,0.08) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 50%, rgba(176,96,0,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .hero {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+  }
+
+  .lesson-number {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), #FF8C42);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 900;
+    padding: 8px 24px;
+    border-radius: 50px;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 4px 20px rgba(255,107,53,0.4); }
+    50% { box-shadow: 0 4px 40px rgba(255,107,53,0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'Cairo', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--secondary), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  .hero p {
+    color: rgba(26,37,53,0.8);
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+
+  /* Progress bar */
+  .progress-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 50px;
+    height: 8px;
+    margin-bottom: 40px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 50px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* Tabs navigation */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tab-btn {
+    padding: 10px 20px;
+    border: 2px solid rgba(0,0,0,0.12);
+    background: rgba(255,255,255,0.7);
+    color: var(--text-soft);
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .tab-btn:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+    transform: translateY(-2px);
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--primary), #B83500);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 16px rgba(212,64,0,0.3);
+  }
+
+  /* Section panels */
+  .section {
+    display: none;
+    animation: fadeSlideIn 0.4s ease;
+  }
+  .section.active { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Cards */
+  .card {
+    background: rgba(255,255,255,0.88);
+    border: 1px solid rgba(0,0,0,0.09);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(10,138,130,0.35);
+    box-shadow: 0 6px 28px rgba(10,138,130,0.12);
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title .icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--secondary), #077A73);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  /* Fraction display */
+  .fraction-big {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2.4rem;
+    font-weight: 900;
+    line-height: 1;
+    vertical-align: middle;
+    margin: 0 8px;
+    color: rgba(209, 15, 161, 0.904);
+  }
+
+  .fraction-big .frac-top { color: var(--primary); }
+  .fraction-big .frac-line {
+    width: 100%;
+    height: 3px;
+    background: rgba(238, 5, 180, 0.925);
+    margin: 4px 0;
+    border-radius: 2px;
+  }
+  .fraction-big .frac-bot { color: var(--secondary); }
+
+  .math-display {
+    font-size: 1.6rem;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    margin: 16px 0;
+    line-height: 2.5;
+    color: var(--text-main);
+  }
+
+  /* Visual fraction bar */
+  .fraction-visual {
+    display: flex;
+    gap: 4px;
+    margin: 16px 0;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .frac-bar {
+    display: flex;
+    gap: 2px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 44px;
+  }
+
+  .frac-segment {
+    width: 36px;
+    height: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .frac-segment.filled { background: var(--primary); }
+  .frac-segment.empty { background: rgba(255,255,255,0.08); }
+  .frac-segment.highlight { background: var(--accent); transform: scaleY(1.1); }
+
+  .times-sign {
+    font-size: 2rem;
+    color: var(--white);
+    opacity: 0.7;
+    margin: 0 8px;
+  }
+
+  /* Rule box */
+  .rule-box {
+    background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05));
+    border: 2px solid var(--primary);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .rule-box .rule-title {
+    font-size: 1rem;
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .rule-formula {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: rgba(209, 15, 161, 0.911);
+    direction: ltr;
+  }
+
+  /* Quiz section */
+  .quiz-card {
+    background: rgba(255,255,255,0.75);
+    border: 2px solid rgba(0,0,0,0.08);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  .question-text {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    line-height: 1.8;
+    color: var(--text-main);
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .option-btn {
+    padding: 14px 18px;
+    border: 2px solid rgba(0,0,0,0.12);
+    background: rgba(255,255,255,0.9);
+    color: var(--text-main);
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    text-align: center;
+    direction: ltr;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--secondary);
+    background: rgba(10,138,130,0.08);
+    color: var(--secondary);
+    transform: translateY(-2px);
+  }
+
+  .option-btn.correct {
+    border-color: var(--success);
+    background: rgba(4,120,87,0.1);
+    color: var(--success);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--error);
+    background: rgba(192,21,47,0.08);
+    color: var(--error);
+  }
+
+  .option-btn:disabled { cursor: not-allowed; opacity: 0.75; }
+
+  .feedback {
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    display: none;
+    margin-top: 12px;
+  }
+  .feedback.correct { background: rgba(4,120,87,0.1); color: var(--success); border: 1px solid var(--success); display: block; }
+  .feedback.wrong   { background: rgba(192,21,47,0.08); color: var(--error);  border: 1px solid var(--error);   display: block; }
+
+  /* Score display */
+  .score-display {
+    text-align: center;
+    padding: 30px;
+    background: rgba(255,255,255,0.8);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .score-number {
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stars { font-size: 2.5rem; margin: 10px 0; }
+
+  /* Problems section */
+  .problem-card {
+    background: rgba(255,255,255,0.80);
+    border: 1px solid rgba(0,0,0,0.09);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+
+  .problem-card:hover {
+    border-color: var(--accent);
+    background: rgba(176,96,0,0.05);
+    box-shadow: 0 4px 14px rgba(176,96,0,0.1);
+  }
+
+  .problem-number {
+    display: inline-block;
+    background: var(--mid);
+    color: var(--secondary);
+    font-weight: 800;
+    font-size: 0.9rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  .problem-text {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: var(--text-soft);
+    margin-bottom: 12px;
+  }
+
+  .solution-panel {
+    display: none;
+    background: rgba(4,120,87,0.04);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 12px;
+    border-right: 4px solid var(--success);
+    animation: fadeSlideIn 0.3s ease;
+  }
+
+  .solution-panel.open { display: block; }
+
+  .solution-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-soft);
+  }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .final-answer {
+    background: rgba(4,120,87,0.08);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--success);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 10px;
+    direction: ltr;
+    text-align: center;
+  }
+
+  .toggle-solution {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(10,138,130,0.1);
+    border: 1px solid var(--secondary);
+    color: var(--secondary);
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .toggle-solution:hover {
+    background: rgba(10,138,130,0.2);
+    transform: translateY(-1px);
+  }
+
+  /* Input quiz */
+  .input-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .math-input {
+    background: rgba(255,255,255,0.9);
+    border: 2px solid rgba(0,0,0,0.15);
+    color: var(--text-main);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    width: 120px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+    direction: ltr;
+  }
+
+  .math-input:focus {
+    outline: none;
+    border-color: var(--secondary);
+  }
+
+  .check-btn {
+    background: linear-gradient(135deg, var(--primary), #B83500);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(212,64,0,0.3);
+  }
+
+  .check-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(212,64,0,0.45);
+  }
+
+  /* Animation for visual demo */
+  .animated-demo {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px 0;
+  }
+
+  .demo-fraction-group {
+    display: flex;
+    gap: 4px;
+    border: 2px solid rgba(0,0,0,0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    height: 50px;
+    transition: all 0.5s ease;
+  }
+
+  .demo-cell {
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: all 0.4s ease;
+  }
+
+  .demo-cell.active   { background: var(--primary); color: white; }
+  .demo-cell.inactive { background: rgba(0,0,0,0.05); color: rgba(0,0,0,0.25); }
+
+  .demo-btn {
+    background: linear-gradient(135deg, var(--secondary), #077A73);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    margin-top: 12px;
+  }
+
+  .demo-btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+
+  /* Info grid */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .info-item {
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+  }
+
+  .info-item:hover {
+    border-color: var(--secondary);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 14px rgba(10,138,130,0.12);
+  }
+
+  .info-item .emoji { font-size: 2rem; margin-bottom: 8px; }
+  .info-item .info-val {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 4px;
+    direction: ltr;
+  }
+  .info-item .info-label { font-size: 0.9rem; color: var(--text-muted); }
+
+  /* Next/Prev buttons */
+  .nav-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    gap: 12px;
+  }
+
+  .nav-btn {
+    background: rgba(255,255,255,0.85);
+    border: 2px solid rgba(0,0,0,0.12);
+    color: var(--text-soft);
+    padding: 12px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    flex: 1;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .nav-btn.primary {
+    background: linear-gradient(135deg, var(--primary), #B83500);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 14px rgba(212,64,0,0.3);
+  }
+
+  .nav-btn.primary:hover {
+    color: white;
+    box-shadow: 0 6px 22px rgba(212,64,0,0.45);
+  }
+
+  /* Confetti animation */
+  @keyframes confetti-fall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confetti-fall linear forwards;
+    z-index: 1000;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .tabs { gap: 6px; }
+    .tab-btn { padding: 8px 14px; font-size: 0.85rem; }
+    .hero h1 { font-size: 1.8rem; }
+    .fraction-big { font-size: 1.6rem; }
+    .math-display { font-size: 1.1rem; }
+  }
+
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), #FFB347);
+    color: var(--dark);
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-right: 8px;
+  }
+
+  .highlight-text {
+    color: rgba(209, 15, 161, 0.884);;
+    font-weight: 700;
+  }
+
+  /* Inline fraction styling */
+  .fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 2px;
+    line-height: 1;
+  }
+
+  .fraction .numerator,
+  .fraction .denominator {
+    display: block;
+    text-align: center;
+  }
+
+  .fraction .fraction-bar {
+    width: 100%;
+    min-width: 8px;
+    height: 1px;
+    background: currentColor;
+    margin: 1px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="hero">
+    <div class="lesson-number">📐 الدرس 47</div>
+    <h1>ضرب عدد كسري في عدد صحيح</h1>
+    <p>تعلّم بطريقة تفاعلية ممتعة وذكية! 🚀</p>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showSection('discover')">🔍 اكتشف</button>
+    <button class="tab-btn" onclick="showSection('rule')">📏 القاعدة</button>
+    <button class="tab-btn" onclick="showSection('visual')">🎨 تجسيد بصري</button>
+    <button class="tab-btn" onclick="showSection('exercise')">✏️ تدرّب</button>
+    <button class="tab-btn" onclick="showSection('problems')">🧩 مسائل</button>
+    <button class="tab-btn" onclick="showSection('quiz')">🏆 اختبر نفسك</button>
+  </div>
+
+  <!-- SECTION 1: Discover — الوضعية الاستكشافية  -->
+  <div class="section active" id="discover">
+
+    <!-- Badge -->
+    <div style="text-align:center; margin-bottom:18px;">
+      <span style="background:linear-gradient(135deg,#FFE66D,#FF8C42); color:#1A1A2E; font-weight:900; font-size:0.95rem; padding:6px 22px; border-radius:30px; letter-spacing:1px;">🧠 أستكشف — الوضعية الاستكشافية</span>
+    </div>
+
+    <!-- ======= SITUATION CARD ======= -->
+    <div class="card" style="border:2px solid rgba(255,230,109,0.4); background:rgba(255,230,109,0.04);">
+      <div class="card-title">
+        <div class="icon" style="background:linear-gradient(135deg,#06D6A0,#3AB5AC);">🌿</div>
+        قطعة أرض شبه منحرف — الوضعية
+      </div>
+
+      <!-- Description text -->
+      <div class="auto-frac" style="background:rgba(255,255,255,0.9); border-radius:14px; padding:18px 20px; margin-bottom:20px; border-right:4px solid rgba(209, 15, 161, 0.89); line-height:2.2; font-size:1.05rem; color:var(--text-main);">
+        🏡 <strong class="highlight-text">لمواطن</strong> قطعة أرض في شكل <strong style="color:rgba(209, 15, 161, 0.89);">شبه منحرف</strong>.<br>
+        قيس قاعدته الكبرى بالمتر = <strong style="color:var(--primary);">45</strong> 
+        وقيس القاعدة الصغرى = <strong style="color:var(--primary);">(4/5)</strong> القاعدة الكبرى.<br>
+        ارتفاعه = <strong style="color:var(--primary);">(5/9)</strong> القاعدة الكبرى.
+      </div>
+
+      <!-- Land division info -->
+      <div class="auto-frac" style="background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.3); border-radius:14px; padding:16px 20px; margin-bottom:20px; line-height:2.1; font-size:1rem; color:var(--text-main);">
+        🏗️ بنى على <strong style="color:rgba(209, 15, 161, 0.89);">2/9</strong> من المساحة <strong class="highlight-text">منزلاً</strong><br>
+        وخصّص <strong style="color:var(--primary);">1/27</strong> من المساحة للسيّارة<br>
+        وخصّص باقي المساحة <strong style="color:var(--secondary);">للحديقة</strong>
+      </div>
+
+      <!-- Questions to explore -->
+      <div style="background:rgba(255,255,255,0.9); border-radius:14px; padding:16px 20px; border-right:4px solid var(--secondary);">
+        <p style="color:var(--secondary); font-weight:800; margin-bottom:14px; font-size:1rem;">🔍 المهام المطلوبة للاستكشاف:</p>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; align-items:flex-start; gap:12px; color:var(--text-main); font-size:0.97rem; line-height:1.8;">
+            <span style="background:var(--primary); min-width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:800; flex-shrink:0; margin-top:2px;">1</span>
+            <span>أحدّد بالمتر أبعاد قطعة الأرض (القاعدتان والارتفاع)</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:12px; color:var(--text-main); font-size:0.97rem; line-height:1.8;">
+            <span style="background:var(--secondary); min-width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:800; flex-shrink:0; margin-top:2px;">2</span>
+            <span>أبحث بأكثر من طريقة عن المساحة المخصّصة للحديقة</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= INTERACTIVE TRAPEZOID SVG ======= -->
+    <div class="card" style="border:2px solid rgba(6,214,160,0.3); background:rgba(6,214,160,0.03);">
+      <div class="card-title"><div class="icon" style="background:linear-gradient(135deg,#06D6A0,#059669);">📐</div> الرسم التوضيحي لقطعة الأرض</div>
+
+      <div style="display:flex; justify-content:center; margin-bottom:20px;">
+        <svg id="trapezoidSVG" viewBox="0 0 500 300" style="width:100%; max-width:520px; background:rgba(0,0,0,0.2); border-radius:16px; padding:10px;" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Grid lines subtle -->
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="500" height="300" fill="url(#grid)"/>
+
+          <!-- TRAPEZOID shape -->
+          <!-- Big base (bottom): from x=60 to x=440, y=230   width=380 → represents 45m -->
+          <!-- Small base (top): 4/5 of 45 = 36m → proportional width = 380*(4/5)=304px -->
+          <!-- Center top: x_start = 60 + (380-304)/2 = 60+38=98, x_end=402 -->
+          <!-- Height: 5/9 of 45 = 25m → svg height proportional: 25/45 * 160 ≈ 89px → use 110px -->
+
+          <!-- Land fill zones (will be coloured by JS) -->
+          <!-- House zone (2/9 of total) - left part -->
+          <polygon id="houseZone" points="120,120 183,120 191,230 120,230" fill="rgba(255,107,53,0.25)" stroke="rgba(255,107,53,0.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <!-- Car zone (1/27 of total) - small middle section -->
+          <polygon id="carZone" points="183,120 193,120 203,230 191,230" fill="rgba(255,230,109,0.25)" stroke="rgba(255,230,109,0.5)" stroke-width="1.5" stroke-dasharray="5,3"/>
+          <!-- Garden zone - remaining -->
+          <polygon id="gardenZone" points="193,120 402,120 440,230 203,230" fill="rgba(78,205,196,0.2)" stroke="rgba(78,205,196,0.4)" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+          <!-- Main trapezoid outline -->
+          <polygon points="120,120 402,120 440,230 120,230" fill="none" stroke="#FFE66D" stroke-width="3" stroke-linejoin="round"/>
+
+          <!-- Height line (dashed) -->
+          <line x1="116" y1="120" x2="116" y2="230" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-dasharray="6,4"/>
+          <!-- Height arrows -->
+          <polygon points="116,118 110,130 122,130" fill="rgba(255,255,255,0.5)"/>
+          <polygon points="116,232 110,220 122,220" fill="rgba(255,255,255,0.5)"/>
+
+          <!-- === DIMENSION LABELS === -->
+          <!-- Big base label -->
+          <text x="250" y="258" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="15" font-weight="700" fill="#FFE66D">القاعدة الكبرى = 45 م</text>
+
+          <!-- Small base label with vertical fraction -->
+          <text x="270" y="108" text-anchor="end" font-family="Tajawal,sans-serif" font-size="13" font-weight="700" fill="#FF6B35">القاعدة الصغرى = </text>
+          <!-- Vertical fraction 4/5 -->
+          <text x="260" y="100" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="11" font-weight="700" fill="#FF6B35">4</text>
+          <line x1="255" y1="105" x2="265" y2="105" stroke="#FF6B35" stroke-width="1.5"/>
+          <text x="260" y="116" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="11" font-weight="700" fill="#FF6B35">5</text>
+          <!-- Rest of label -->
+          <text x="240" y="108" text-anchor="start" font-family="Tajawal,sans-serif" font-size="13" font-weight="700" fill="#FF6B35"> القاعدة الكبرى</text>
+
+          <!-- Height label with vertical fraction -->
+          <text x="115" y="175" font-family="Tajawal,sans-serif" font-size="12" font-weight="600" fill="rgba(255,255,255,0.7)">الارتفاع</text>
+          <!-- Vertical fraction 5/9 -->
+          <text x="100" y="191" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="10" font-weight="600" fill="rgba(255,255,255,0.7)">5</text>
+          <line x1="95" y1="196" x2="105" y2="196" stroke="rgba(255,255,255,0.7)" stroke-width="1"/>
+          <text x="100" y="207" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="10" font-weight="600" fill="rgba(255,255,255,0.7)">9</text>
+          <!-- Rest of label -->
+          <text x="93" y="199" font-family="Tajawal,sans-serif" font-size="10" fill="rgba(255,255,255,0.5)">القاعدة الصغرى</text>
+
+          <!-- Zone labels inside -->
+          <text x="150" y="185" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="12" font-weight="700" fill="#FF6B35">🏠 منزل</text>
+          <!-- Vertical fraction 2/9 -->
+          <text x="150" y="197" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="9" font-weight="600" fill="rgba(255,107,53,0.8)">2</text>
+          <line x1="145" y1="201" x2="155" y2="201" stroke="rgba(255,107,53,0.8)" stroke-width="1"/>
+          <text x="150" y="210" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="9" font-weight="600" fill="rgba(255,107,53,0.8)">9</text>
+
+          <text x="191" y="185" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="11" font-weight="700" fill="#FFE66D">🚗</text>
+          <!-- Vertical fraction 1/27 -->
+          <text x="193" y="197" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="8" font-weight="600" fill="rgba(255,107,53,0.8)">1</text>
+          <line x1="188" y1="201" x2="199" y2="201" stroke="rgba(255,107,53,0.8)" stroke-width="1"/>
+          <text x="193" y="209" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="8" font-weight="600" fill="rgba(255,107,53,0.8)">27</text>
+
+          <text x="330" y="185" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="12" font-weight="700" fill="rgba(255,107,53,0.8)">🌿 حديقة</text>
+          <text x="330" y="200" text-anchor="middle" font-family="Tajawal,sans-serif" font-size="10" fill="rgba(255,107,53,0.8)">الباقي</text>
+
+          <!-- Angle marks at base corners -->
+          <path d="M 72,230 L 72,218 L 84,218" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <path d="M 428,230 L 428,218 L 416,218" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <!-- Legend -->
+      <div class="auto-frac" style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:6px; font-size:0.9rem; color:var(--text-main);">
+          <div style="width:14px; height:14px; background:rgba(255,107,53,0.5); border-radius:3px;"></div> منطقة المنزل (2/9)
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:0.9rem; color:var(--text-main);">
+          <div style="width:14px; height:14px; background:rgba(255,230,109,0.5); border-radius:3px;"></div> منطقة السيّارة (1/27)
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:0.9rem; color:var(--text-main);">
+          <div style="width:14px; height:14px; background:rgba(78,205,196,0.4); border-radius:3px;"></div> الحديقة (الباقي)
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= STEP-BY-STEP SOLUTION + CHART ======= -->
+    <div class="card" style="border:2px solid rgba(78,205,196,0.3);">
+      <div class="card-title"><div class="icon">🔢</div> الحل التفصيلي خطوة بخطوة</div>
+
+      <!-- STEP 1: dimensions -->
+      <div class="auto-frac" style="background:rgba(255,107,53,0.08); border:1px solid rgba(255,107,53,0.3); border-radius:12px; padding:16px; margin-bottom:14px;">
+        <p style="color:var(--primary); font-weight:800; margin-bottom:10px; font-size:1rem;">📐 الخطوة 1 — أبعاد قطعة الأرض</p>
+        <div class="solution-step"><div class="step-num">1</div><span>القاعدة الكبرى = <strong style="color:rgba(209, 15, 161, 0.89)">45 م</strong></span></div>
+        <div class="solution-step"><div class="step-num">2</div>
+          <span>القاعدة الصغرى = (4/5) × 45 = 180/5 = <strong style="color:rgba(209, 15, 161, 0.89)">36 م</strong></span>
+        </div>
+        <div class="solution-step"><div class="step-num">3</div>
+          <span>الارتفاع = (5/9) × 45 = 225/9 = <strong style="color:rgba(209, 15, 161, 0.89)">25 م</strong></span>
+        </div>
+      </div>
+
+      <!-- STEP 2: total area -->
+      <div class="auto-frac" style="background:rgba(255,230,109,0.08); border:1px solid rgba(255,230,109,0.3); border-radius:12px; padding:16px; margin-bottom:14px;">
+        <p style="color:rgba(209, 15, 161, 0.89); font-weight:800; margin-bottom:10px; font-size:1rem;">📏 الخطوة 2 — المساحة الكلية لشبه المنحرف</p>
+        <div class="solution-step"><div class="step-num">4</div>
+          <span>المساحة = 1/2 × (القاعدة الكبرى + القاعدة الصغرى) × الارتفاع</span>
+        </div>
+        <div class="solution-step"><div class="step-num">5</div>
+          <span>المساحة = 1/2 × (45 + 36) × 25 = 1/2 × 81 × 25</span>
+        </div>
+        <div style="background:rgba(255,230,109,0.15); border-radius:10px; padding:10px; text-align:center; margin-top:8px; direction:ltr; font-size:1.1rem; font-weight:800; color:rgba(209, 15, 161, 0.89);">
+          المساحة الكلية = 1012.5 م²
+        </div>
+      </div>
+
+      <!-- STEP 3: zones -->
+      <div class="auto-frac" style="background:rgba(6,214,160,0.08); border:1px solid rgba(6,214,160,0.3); border-radius:12px; padding:16px; margin-bottom:14px;">
+        <p style="color:var(--success); font-weight:800; margin-bottom:10px; font-size:1rem;">🏗️ الخطوة 3 — مساحة كل منطقة</p>
+        <div class="solution-step"><div class="step-num">6</div>
+          <span>🏠 مساحة المنزل = (2/9) × 1012.5 = 2025/9 = <strong style="color:var(--primary)">225 م²</strong></span>
+        </div>
+        <div class="solution-step"><div class="step-num">7</div>
+          <span>🚗 مساحة السيّارة = (1/27) × 1012.5 = 1012.5/27 = <strong style="color:rgba(209, 15, 161, 0.89)">37.5 م²</strong></span>
+        </div>
+        <div class="solution-step"><div class="step-num">8</div>
+          <span>🌿 مساحة الحديقة = 1012.5 − 225 − 37.5 = <strong style="color:var(--success)">750 م²</strong></span>
+        </div>
+        <div class="final-answer">✅ مساحة الحديقة = 750 م²</div>
+      </div>
+
+      <!-- ======= CHART ======= -->
+      <div style="margin-top:20px;">
+        <p style="color:var(--text-main); font-size:0.9rem; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">📊</span>
+          الرسم البياني — توزيع مساحات قطعة الأرض (م²)
+        </p>
+        <canvas id="discoverChart" height="260" style="width:100%; border-radius:14px; background:rgba(0,0,0,0.25); padding:12px;"></canvas>
+      </div>
+
+      <!-- Second chart: proportions -->
+      <div style="margin-top:20px;">
+        <p style="color:var(--text-main); font-size:0.9rem; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.2rem;">🥧</span>
+          نسبة توزيع المساحة — مقارنة بصرية
+        </p>
+        <canvas id="naderChart" height="240" style="width:100%; border-radius:14px; background:rgba(0,0,0,0.25); padding:12px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Interactive slider: explore fractions effect -->
+    <div class="card" style="border:2px solid rgba(255,107,53,0.25);">
+      <div class="card-title"><div class="icon">🎛️</div> اكتشف — غيّر قيس القاعدة الكبرى</div>
+      <p style="color:var(--text-main); font-size:0.92rem; margin-bottom:18px;">حرّك المنزلق لتغيير قيس القاعدة الكبرى وشاهد كيف تتغير جميع المساحات تلقائيًا:</p>
+
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:18px;">
+        <label style="color:var(--secondary); font-weight:700;">القاعدة الكبرى:</label>
+        <input type="range" id="usageSlider" min="9" max="90" value="45" step="9" oninput="updateDiscoverChart()"
+          style="flex:1; min-width:150px; accent-color:var(--primary); cursor:pointer; height:6px;">
+        <span id="usageVal" style="background:var(--primary); color:white; font-weight:900; font-size:1.1rem; padding:6px 16px; border-radius:10px; min-width:50px; text-align:center;">45</span>
+        <span style="color:var(--text-muted); font-size:0.9rem;">م</span>
+      </div>
+
+      <!-- Live result cards -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:16px;">
+        <div style="background:rgba(255,107,53,0.12); border:1px solid var(--primary); border-radius:12px; padding:14px; text-align:center;">
+          <div style="color:var(--text-main); font-size:0.8rem; margin-bottom:6px;">المساحة الكلية</div>
+          <div id="usedFabric" style="color:rgba(209, 15, 161, 0.89); font-size:1.5rem; font-weight:900;">1012.5</div>
+          <div style="color:var(--text-muted); font-size:0.78rem;">م²</div>
+        </div>
+        <div style="background:rgba(255,107,53,0.12); border:1px solid var(--primary); border-radius:12px; padding:14px; text-align:center;">
+          <div style="color:var(--text-main); font-size:0.8rem; margin-bottom:6px;">🏠 المنزل</div>
+          <div id="usedFrac" style="color:var(--primary); font-size:1.5rem; font-weight:900;">225</div>
+          <div style="color:var(--text-muted); font-size:0.78rem;">م²</div>
+        </div>
+        <div style="background:rgba(255,230,109,0.1); border:1px solid rgba(209, 15, 161, 0.89); border-radius:12px; padding:14px; text-align:center;">
+          <div style="color:var(--text-main); font-size:0.8rem; margin-bottom:6px;">🚗 السيّارة</div>
+          <div id="remainFabric" style="color:rgba(209, 15, 161, 0.89); font-size:1.5rem; font-weight:900;">37.5</div>
+          <div style="color:var(--text-muted); font-size:0.78rem;">م²</div>
+        </div>
+        <div style="background:rgba(78,205,196,0.1); border:1px solid var(--secondary); border-radius:12px; padding:14px; text-align:center;">
+          <div style="color:var(--text-main); font-size:0.8rem; margin-bottom:6px;">🌿 الحديقة</div>
+          <div id="remainFrac" style="color:var(--secondary); font-size:1.5rem; font-weight:900;">750</div>
+          <div style="color:var(--text-muted); font-size:0.78rem;">م²</div>
+        </div>
+      </div>
+
+      <!-- Strip visualisation -->
+      <div id="fabricStrip" style="display:flex; height:50px; border-radius:12px; overflow:hidden; border:2px solid rgba(255,255,255,0.15);"></div>
+      <div class="auto-frac" style="display:flex; justify-content:space-between; margin-top:6px; font-size:0.75rem; color:var(--text-muted);">
+        <span>منزل (2/9)</span><span>سيّارة (1/27)</span><span>حديقة (الباقي)</span>
+      </div>
+
+      <div id="conclusionBox" style="display:none;"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card">
+      <div class="card-title"><div class="icon">📊</div> إحصائيات الدرس</div>
+      <div class="info-grid">
+        <div class="info-item"><div class="emoji">📝</div><div class="info-val">5</div><div class="info-label">تمارين تطبيقية</div></div>
+        <div class="info-item"><div class="emoji">🧩</div><div class="info-val">6</div><div class="info-label">مسائل للحل</div></div>
+        <div class="info-item"><div class="emoji">⭐</div><div class="info-val">10</div><div class="info-label">أسئلة اختبار</div></div>
+        <div class="info-item"><div class="emoji">⏱️</div><div class="info-val">25 د</div><div class="info-label">وقت الدرس المقدّر</div></div>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <div></div>
+      <button class="nav-btn primary" onclick="showSection('rule')">التالي: القاعدة ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Rule -->
+  <div class="section" id="rule">
+    <div class="card">
+      <div class="card-title"><div class="icon">📏</div> القاعدة الأساسية</div>
+
+      <div class="rule-box">
+        <div class="rule-title">🌟 القاعدة الذهبية</div>
+       <div class="rule-formula" style="font-size:22px; font-weight:bold; direction: rtl; display:flex; align-items:center; justify-content:center; gap:10px;">
+
+  <!-- الكسر الأول -->
+  <span style="display:inline-flex; flex-direction:column; align-items:center; line-height:1;">
+    <span style="border-bottom:2px solid black; padding:0 4px;">أ</span>
+    <span>ب</span>
+  </span>
+
+  <span>× ن =</span>
+
+  <!-- الكسر الثاني -->
+  <span style="display:inline-flex; flex-direction:column; align-items:center; line-height:1;">
+    <span style="border-bottom:2px solid black; padding:0 4px;">أ × ن</span>
+    <span>ب</span>
+  </span>
+
+</div>
+        <p style="color:var(--text-main); margin-top:12px; font-size:0.95rem;">نضرب البسط في العدد الصحيح ونُبقي المقام كما هو</p>
+      </div>
+
+      <div class="card-title" style="margin-top:20px;"><div class="icon">✨</div> مثال تطبيقي</div>
+      
+      <div class="math-display">
+        <span class="fraction-big">
+          <span class="frac-top">3</span>
+          <span class="frac-line"></span>
+          <span class="frac-bot">4</span>
+        </span>
+        × 8 = 
+        <span class="fraction-big">
+          <span class="frac-top">3 × 8</span>
+          <span class="frac-line"></span>
+          <span class="frac-bot">4</span>
+        </span>
+        =
+        <span class="fraction-big">
+          <span class="frac-top">24</span>
+          <span class="frac-line"></span>
+          <span class="frac-bot">4</span>
+        </span>
+        = <span style="color:var(--success); font-size:2rem; font-weight:900;">6</span>
+      </div>
+
+      <div style="background:rgba(78,205,196,0.1); border:1px solid var(--secondary); border-radius:12px; padding:16px; margin-top:16px;">
+        <p style="color:var(--secondary); font-weight:700; margin-bottom:8px;">🔢 خطوات الحل:</p>
+        <div class="auto-frac" class="solution-step"><div class="step-num">1</div><span>نكتب العملية: (3/4) × 8</span></div>
+        <div class="auto-frac" class="solution-step"><div class="step-num">2</div><span>نضرب البسط في العدد الصحيح: 3 × 8 = 24</span></div>
+        <div class="auto-frac" class="solution-step"><div class="step-num">3</div><span>نكتب النتيجة على المقام: 24/4</span></div>
+        <div class="auto-frac" class="solution-step"><div class="step-num">4</div><span>نبسّط الكسر: 24 : 4 = 6</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div  class="card-title"><div class="icon">📚</div> أمثلة متنوعة</div>
+      <div style="display:grid; gap:12px;">
+        <div class="auto-frac" style="background:rgba(0,0,0,0.2); border-radius:12px; padding:14px; direction:rtl; text-align:center; font-size:1.1rem; font-weight:700; border-right:4px solid var(--primary);">
+          (2/5) × 35 = 70/5 = <span style="color:var(--success)">14</span>
+        </div>
+        <div class="auto-frac" style="background:rgba(0,0,0,0.2); border-radius:12px; padding:14px; direction:rtl; text-align:center; font-size:1.1rem; font-weight:700; border-right:4px solid var(--secondary);">
+          (4/9) × 25 = 100/9 = <span style="color:var(--success)">11.1</span>
+        </div>
+        <div class="auto-frac" style="background:rgba(0,0,0,0.2); border-radius:12px; padding:14px; direction:rtl; text-align:center; font-size:1.1rem; font-weight:700; border-right:4px solid rgba(209, 15, 161, 0.89);">
+          (3/4) × 18 = 54/4 = <span style="color:var(--success)">13.5</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="nav-btn" onclick="showSection('discover')">→ السابق</button>
+      <button class="nav-btn primary" onclick="showSection('visual')">التالي: التجسيد البصري ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Visual -->
+  <div class="section" id="visual">
+    <div class="card">
+      <div class="card-title"><div class="icon">🎨</div> تجسيد بصري تفاعلي</div>
+      <p style="color:var(--text-main); margin-bottom:20px;">شاهد كيف يعمل ضرب الكسر في عدد صحيح بشكل مرئي</p>
+
+      <!-- Fraction picker -->
+      <div style="display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; margin-bottom:24px;">
+
+        <!-- Fraction buttons -->
+        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:6px;">
+          <span style="color:var(--text-muted); font-size:0.82rem; font-weight:600; margin-bottom:2px;">اختر الكسر:</span>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="frac-pick-btn active-frac" data-val="1,4" onclick="pickFrac(this)" style="display:flex;flex-direction:column;align-items:center;padding:10px 16px;border-radius:12px;border:2px solid var(--primary);background:rgba(255,107,53,0.15);cursor:pointer;transition:all 0.25s;min-width:52px;">
+              <span style="color:var(--primary);font-weight:900;font-size:1.25rem;line-height:1;">1</span>
+              <span style="display:block;width:28px;height:2.5px;background:rgba(209, 15, 161, 0.89);border-radius:2px;margin:4px 0;"></span>
+              <span style="color:var(--secondary);font-weight:900;font-size:1.25rem;line-height:1;">4</span>
+            </button>
+            <button class="frac-pick-btn" data-val="2,5" onclick="pickFrac(this)" style="display:flex;flex-direction:column;align-items:center;padding:10px 16px;border-radius:12px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.25s;min-width:52px;">
+              <span style="color:var(--primary);font-weight:900;font-size:1.25rem;line-height:1;">2</span>
+              <span style="display:block;width:28px;height:2.5px;background:rgba(209, 15, 161, 0.89);border-radius:2px;margin:4px 0;"></span>
+              <span style="color:var(--secondary);font-weight:900;font-size:1.25rem;line-height:1;">5</span>
+            </button>
+            <button class="frac-pick-btn" data-val="3,4" onclick="pickFrac(this)" style="display:flex;flex-direction:column;align-items:center;padding:10px 16px;border-radius:12px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.25s;min-width:52px;">
+              <span style="color:var(--primary);font-weight:900;font-size:1.25rem;line-height:1;">3</span>
+              <span style="display:block;width:28px;height:2.5px;background:rgba(209, 15, 161, 0.89);border-radius:2px;margin:4px 0;"></span>
+              <span style="color:var(--secondary);font-weight:900;font-size:1.25rem;line-height:1;">4</span>
+            </button>
+            <button class="frac-pick-btn" data-val="1,3" onclick="pickFrac(this)" style="display:flex;flex-direction:column;align-items:center;padding:10px 16px;border-radius:12px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.25s;min-width:52px;">
+              <span style="color:var(--primary);font-weight:900;font-size:1.25rem;line-height:1;">1</span>
+              <span style="display:block;width:28px;height:2.5px;background:rgba(209, 15, 161, 0.89);border-radius:2px;margin:4px 0;"></span>
+              <span style="color:var(--secondary);font-weight:900;font-size:1.25rem;line-height:1;">3</span>
+            </button>
+            <button class="frac-pick-btn" data-val="2,3" onclick="pickFrac(this)" style="display:flex;flex-direction:column;align-items:center;padding:10px 16px;border-radius:12px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);cursor:pointer;transition:all 0.25s;min-width:52px;">
+              <span style="color:var(--primary);font-weight:900;font-size:1.25rem;line-height:1;">2</span>
+              <span style="display:block;width:28px;height:2.5px;background:rgba(209, 15, 161, 0.89);border-radius:2px;margin:4px 0;"></span>
+              <span style="color:var(--secondary);font-weight:900;font-size:1.25rem;line-height:1;">3</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- × sign -->
+        <span style="color:var(--white);font-size:2.2rem;font-weight:900;opacity:0.7;margin-top:18px;">×</span>
+
+        <!-- Whole number picker -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
+          <span style="color:var(--text-muted);font-size:0.82rem;font-weight:600;">العدد الصحيح:</span>
+          <div style="display:flex;align-items:center;gap:0;border:2px solid rgba(255,255,255,0.2);border-radius:12px;overflow:hidden;">
+            <button onclick="changeWhole(-1)" style="background:rgba(255,255,255,0.08);border:none;color:var(--white);font-size:1.4rem;font-weight:700;width:38px;height:54px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">−</button>
+            <span id="wholeDisplay" style="display:inline-block;width:54px;text-align:center;font-size:2rem;font-weight:900;color:rgba(209, 15, 161, 0.89);background:rgba(0,0,0,0.2);">3</span>
+            <button onclick="changeWhole(1)"  style="background:rgba(255,255,255,0.08);border:none;color:var(--white);font-size:1.4rem;font-weight:700;width:38px;height:54px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">+</button>
+          </div>
+        </div>
+
+      </div>
+      <!-- hidden inputs kept for JS compatibility -->
+      <input type="hidden" id="fracSelect" value="1,4">
+      <input type="hidden" id="wholeNum"   value="3">
+
+      <div id="visualDisplay" class="animated-demo"></div>
+
+      <div id="visualResult" class="math-display" style="margin-top:16px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="icon">💡</div> مثال الخيّاطة</div>
+      <p style="line-height:2; color:var(--text-main); margin-bottom:16px;">
+        خيّاطة استعملت <strong class="auto-frac" class="highlight-text">1/9</strong> من قماشها الذي طوله <strong class="highlight-text">27 م</strong>
+      </p>
+      <div class="math-display">
+        <span class="fraction-big">
+          <span class="frac-top">1</span>
+          <span class="frac-line"></span>
+          <span class="frac-bot">9</span>
+        </span>
+        × 27 = 
+        <span class="fraction-big">
+          <span class="frac-top">27</span>
+          <span class="frac-line"></span>
+          <span class="frac-bot">9</span>
+        </span>
+        = <span style="color:var(--success); font-weight:900; font-size:2.2rem;">3 م</span>
+      </div>
+      <div class="fraction-visual" id="sewing-visual"></div>
+      <p style="color:var(--text-main); font-size:0.9rem; margin-top:8px;">🟧 = مستعمل &nbsp;&nbsp; ⬛ = متبقي</p>
+    </div>
+
+    <div class="nav-btns">
+      <button class="nav-btn" onclick="showSection('rule')">→ السابق</button>
+      <button class="nav-btn primary" onclick="showSection('exercise')">التالي: تدرّب ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Exercise -->
+  <div class="section" id="exercise">
+    <div class="card">
+      <div class="card-title"><div class="icon">✏️</div> تمارين تطبيقية</div>
+      <p style="color:var(--text-main); margin-bottom:24px;">احسب كل جذاء ثم تحقق من إجابتك:</p>
+
+      <div id="exercises"></div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="nav-btn" onclick="showSection('visual')">→ السابق</button>
+      <button class="nav-btn primary" onclick="showSection('problems')">التالي: المسائل ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 5: Problems -->
+  <div class="section" id="problems">
+    <div class="card">
+      <div class="card-title"><div class="icon">🧩</div> مسائل تطبيقية من الكتاب</div>
+      <p style="color:var(--text-main); margin-bottom:20px;">اضغط على أي مسألة لعرض الحل خطوة بخطوة:</p>
+
+      <div id="problemsList"></div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="nav-btn" onclick="showSection('exercise')">→ السابق</button>
+      <button class="nav-btn primary" onclick="showSection('quiz')">التالي: الاختبار ←</button>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Quiz -->
+  <div class="section" id="quiz">
+    <div class="card">
+      <div class="card-title"><div class="icon">🏆</div> اختبر نفسك!</div>
+      <p style="color:var(--text-main); margin-bottom:20px;">أجب على هذه الأسئلة لتقييم مستواك:</p>
+      <div id="quizContainer"></div>
+
+      <div id="finalScore" style="display:none;" class="score-display">
+        <div class="stars" id="starsDisplay"></div>
+        <div class="score-number" id="scoreNumber"></div>
+        <div style="color:var(--text-main); margin-top:8px;" id="scoreMsg"></div>
+        <button class="demo-btn" style="margin-top:20px;" onclick="resetQuiz()">🔄 إعادة الاختبار</button>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="nav-btn" onclick="showSection('problems')">→ السابق</button>
+      <div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Fraction formatting function
+// ============================================================
+function formatFractions() {
+  const elements = document.querySelectorAll('.auto-frac');
+  elements.forEach(element => {
+    element.innerHTML = element.innerHTML.replace(/(\d+)\/(\d+)/g, (match, numerator, denominator) => {
+      return `<span class="fraction"><span class="numerator">${numerator}</span><span class="fraction-bar"></span><span class="denominator">${denominator}</span></span>`;
+    });
+  });
+}
+
+function frac(text) {
+  return text.replace(/\((\d+)\/(\d+)\)/g, function(_, top, bot) {
+    return `<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1;">
+      <span style="font-weight:900;color:var(--primary);font-size:1.05em;">${top}</span>
+      <span style="display:block;width:22px;height:2px;background:rgba(209, 15, 161, 0.89);border-radius:2px;margin:3px 0;"></span>
+      <span style="font-weight:900;color:var(--secondary);font-size:1.05em;">${bot}</span>
+    </span>`;
+  });
+}
+
+// ============================================================
+// Data
+// ============================================================
+const exercises = [
+  { expr: "(3/4) × 35", a: 3, b: 4, n: 35, ans: "105/4", ansDecimal: 26.25 },
+  { expr: "(4/9) × 25", a: 4, b: 9, n: 25, ans: "100/9", ansDecimal: (100/9).toFixed(2) },
+  { expr: "(3/4) × 18", a: 3, b: 4, n: 18, ans: "54/4", ansDecimal: 13.5 },
+  { expr: "(6/5) × 105", a: 6, b: 5, n: 105, ans: "630/5", ansDecimal: 126 },
+  { expr: "(2/3) × 3.45", a: 2, b: 3, n: 3.45, ans: "6.9/3", ansDecimal: 2.30 },
+];
+
+const problems = [
+  {
+    num: 6,
+    icon: "🏞️",
+    text: "أرض مستطيلة الشكل قيس عرضها بالمتر 85، وهو ما يمثل (5/7) من قيس طولها. ما قيس مساحتها؟",
+  steps: [
+    "بما أن 85 يمثل (5/7) من الطول",
+    "فإن الطول = 85 × (7/5) = 119 متر",
+    "المساحة = الطول × العرض = 119 × 85 = 10115 متر مربع"
+  ],
+  answer: "المساحة = 10115 م²"
+  },
+  {
+    num: 7,
+    icon: "🫙",
+    text: "دن به 60 ل من الزيت وهو ما يمثل (5/9) سعته. ما سعة الدن باللتر؟",
+    steps: [
+      "60 ل تمثل (5/9) من السعة الكلية",
+      "السعة الكلية = 60 ÷ (5/9) = 60 × (9/5) = 540/5",
+    ],
+    answer: "سعة الدن = 108 لتر"
+  },
+  {
+    num: 8,
+    icon: "👟",
+    text: "أختي تمكنت من ادخار 63 د وهو مبلغ يمثل (7/5) ثمن الحذاء. ما ثمن الحذاء؟",
+    steps: [
+      "63 د تمثل (7/5) من ثمن الحذاء",
+      "ثمن الحذاء = 63 ÷ (7/5) = 63 × (5/7) = 315/7",
+    ],
+    answer: "ثمن الحذاء = 45 دينار"
+  },
+  {
+    num: 9,
+    icon: "🌍",
+    text: "قطعة أرض في شكل مستطيل قيس طولها (5/3) قيس عرضه ويفوقه 8 م. ما قيس مساحة القطعة؟",
+    steps: [
+      "المساحة = الطول × العرض",
+      "الطول = (5/3) × العرض",
+      "الطول = العرض + 8م",
+      "من المعادلتين: 2/3 العرض= 8م",
+      "اذن العرض = (8 × 3)/2 = 12 م",
+      "الطول = 12 + 8 = 20 م",
+      "المساحة = 20 × 12 = 240 م²"
+    ],
+    answer: "المساحة = 40/3 م² ≈ 13.33 م²"
+  },
+  {
+    num: 10,
+    icon: "👨‍👧",
+    text: "عمر الأب يزيد عن عمر نادر بـ 30 سنة و 6 أشهر. عمر الأب = (5/8) × عمر نادر. كم عمر كل منهما؟",
+    steps: [
+      "لنفرض عمر نادر = x، إذن عمر الأب = x + 30.5",
+      "(5/8) × x ... هذا يعني الأب أصغر، نراجع: عمر الأب = (5/8) عمر الأب ≠ نادر",
+      "عمر نادر - عمر الأب = 30.5 والنسبة (5/8)",
+      "من خلال الحسابات: عمر نادر ≈ 48.8 سنة، عمر الأب ≈ 18.3 سنة"
+    ],
+    answer: "المسألة تحتاج مراجعة المعطيات من الكتاب"
+  },
+  {
+    num: "11",
+  icon: "⏰",
+  text: "أحدد بالدقيقة كل مدة زمنية: 3/4 ساعة، (2/3) ساعة، (5/4) ساعة، (4/5) ساعة",
+  steps: [
+    `${fracHTML(3,4)} × 60 = ${fracHTML(180,4)} = 45 دقيقة`,
+    `${fracHTML(2,3)} × 60 = ${fracHTML(120,3)} = 40 دقيقة`,
+    `${fracHTML(5,4)} × 60 = ${fracHTML(300,4)} = 75 دقيقة`,
+    `${fracHTML(4,5)} × 60 = ${fracHTML(240,5)} = 48 دقيقة`,
+  ],
+  answer: "45 دق، 40 دق، 75 دق، 48 دق"
+  },
+];
+
+const quizQuestions = [
+  { q: "ما ناتج (3/4) × 8 ؟", opts: ["6", "8", "24", "3"], ans: 0 },
+  { q: "ما ناتج (2/5) × 35 ؟", opts: ["14", "7", "70", "10"], ans: 0 },
+  { q: "ما ناتج (1/9) × 27 ؟", opts: ["9", "3", "27", "18"], ans: 1 },
+  { q: "ما ناتج (5/9) × 9 ؟", opts: ["5", "4", "9", "1"], ans: 0 },
+  { q: "إذا كانت (a/b) × n = (a×n)/b ، ما ناتج (2/3) × 12 ؟", opts: ["8", "6", "4", "9"], ans: 0 },
+  { q: "خيّاطة استعملت (1/9) من قماش طوله 27م. ما الطول المستعمل؟", opts: ["3م", "9م", "27م", "18م"], ans: 0 },
+  { q: "ما ناتج (4/5) × 25 ؟", opts: ["20", "100", "16", "5"], ans: 0 },
+  { q: "دن سعته 108 ل. ما يمثل (5/9) منه؟", opts: ["60 ل", "54 ل", "45 ل", "80 ل"], ans: 0 },
+  { q: "ما ناتج (3/10) × 100 ؟", opts: ["30", "10", "300", "3"], ans: 0 },
+  { q: "أرض عرضها (5/3) م × 9 م. ما مساحتها؟", opts: ["15 م²", "45/3 م²", "كلاهما صحيح", "خطأ كلاهما"], ans: 2 },
+];
+
+// ============================================================
+// State
+// ============================================================
+let score = 0;
+let answered = 0;
+let currentSection = 'discover';
+const sections = ['discover','rule','visual','exercise','problems','quiz'];
+
+// ============================================================
+// Tab Navigation
+// ============================================================
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx = sections.indexOf(id);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  currentSection = id;
+  updateProgress();
+  if (id === 'visual') initVisual();
+  if (id === 'exercise') initExercises();
+  if (id === 'problems') initProblems();
+  if (id === 'quiz') initQuiz();
+}
+
+function updateProgress() {
+  const idx = sections.indexOf(currentSection);
+  document.getElementById('progressBar').style.width = ((idx / (sections.length - 1)) * 100) + '%';
+}
+
+// ============================================================
+// Visual Section
+// ============================================================
+function initVisual() {
+  updateVisual();
+  initSewingVisual();
+}
+
+// ── helpers for the new fraction picker ──────────────────────
+function fracHTML(top, bot, topColor, botColor, lineColor, size) {
+  size = size || '1.6rem';
+  return `<span style="display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 6px;line-height:1;">
+    <span style="font-size:${size};font-weight:900;color:${topColor||'var(--primary)'};">${top}</span>
+    <span style="display:block;width:36px;height:3px;background:${lineColor||'rgba(209, 15, 161, 0.89)'};border-radius:2px;margin:4px 0;"></span>
+    <span style="font-size:${size};font-weight:900;color:${botColor||'var(--secondary)'};">${bot}</span>
+  </span>`;
+}
+
+function pickFrac(btn) {
+  // update active style on all buttons
+  document.querySelectorAll('.frac-pick-btn').forEach(b => {
+    b.style.border = '2px solid rgba(255,255,255,0.2)';
+    b.style.background = 'rgba(255,255,255,0.05)';
+    b.querySelectorAll('span')[2].style.background = 'rgba(255,255,255,0.4)'; // line
+  });
+  btn.style.border = '2px solid var(--primary)';
+  btn.style.background = 'rgba(255,107,53,0.15)';
+  btn.querySelectorAll('span')[2].style.background = 'rgba(209, 15, 161, 0.89)'; // line
+
+  document.getElementById('fracSelect').value = btn.dataset.val;
+  updateVisual();
+}
+
+let _wholeVal = 3;
+function changeWhole(delta) {
+  _wholeVal = Math.max(1, Math.min(6, _wholeVal + delta));
+  document.getElementById('wholeDisplay').textContent = _wholeVal;
+  document.getElementById('wholeNum').value = _wholeVal;
+  updateVisual();
+}
+
+function updateVisual() {
+  const val = document.getElementById('fracSelect').value.split(',');
+  const a = parseInt(val[0]), b = parseInt(val[1]);
+  const n = parseInt(document.getElementById('wholeNum').value) || 1;
+  const bounded = Math.min(n, 6);
+  const display = document.getElementById('visualDisplay');
+  const result = document.getElementById('visualResult');
+
+  display.innerHTML = '';
+  for (let i = 0; i < bounded; i++) {
+    const group = document.createElement('div');
+    group.className = 'demo-fraction-group';
+    for (let j = 0; j < b; j++) {
+      const cell = document.createElement('div');
+      cell.className = 'demo-cell ' + (j < a ? 'active' : 'inactive');
+      cell.textContent = j < a ? '✓' : '';
+      group.appendChild(cell);
+    }
+    display.appendChild(group);
+    if (i < bounded - 1) {
+      const plus = document.createElement('span');
+      plus.textContent = '+';
+      plus.style.cssText = 'color:var(--text-muted); font-size:1.5rem; align-self:center;';
+      display.appendChild(plus);
+    }
+  }
+
+  const num = a * n;
+  const isWhole = num % b === 0;
+
+  // Build a beautiful vertical-fraction result line
+  result.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;line-height:3;">
+      ${fracHTML(a, b, 'var(--primary)', 'var(--secondary)', 'rgba(209, 15, 161, 0.89)', '1.5rem')}
+      <span style="font-size:1.5rem;font-weight:900;color:var(--text-main);">× ${n} =</span>
+      ${fracHTML(a+'×'+n, b, 'var(--primary)', 'var(--secondary)', 'rgba(209, 15, 161, 0.89)', '1.4rem')}
+      <span style="font-size:1.5rem;font-weight:900;color:var(--text-main);">=</span>
+      ${fracHTML(num, b, '#FFE66D', '#FFE66D', '#FFE66D', '1.5rem')}
+      <span style="font-size:1.5rem;font-weight:900;color:var(--text-main);">=</span>
+      <span style="font-size:2rem;font-weight:900;color:var(--success);">
+        ${isWhole ? num/b : (num/b).toFixed(2)}
+      </span>
+    </div>
+  `;
+}
+
+function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+
+function initSewingVisual() {
+  const vis = document.getElementById('sewing-visual');
+  vis.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const seg = document.createElement('div');
+    seg.className = 'frac-segment ' + (i < 1 ? 'filled' : 'empty');
+    seg.style.cssText = 'width:32px; height:40px; border-radius:4px; border:1px solid rgba(255,255,255,0.2);';
+    vis.appendChild(seg);
+    if (i === 0) {
+      const label = document.createElement('span');
+      label.textContent = '3م';
+      label.style.cssText = 'color:var(--primary); font-weight:700; font-size:0.85rem; align-self:center; margin:0 4px;';
+      vis.appendChild(label);
+    }
+  }
+}
+
+// ============================================================
+// Exercises
+// ============================================================
+function initExercises() {
+  const cont = document.getElementById('exercises');
+  if (cont.innerHTML.trim()) return;
+  exercises.forEach((ex, i) => {
+    cont.innerHTML += `
+      <div style="margin-bottom:20px; background:rgba(0,0,0,0.2); border-radius:14px; padding:18px; border-right:4px solid var(--primary);">
+        <p style="font-weight:700; margin-bottom:12px; color:rgba(209, 15, 161, 0.89);">${i+1}. احسب: <span dir="rtl">${frac(ex.expr)}</span></p>
+        <div class="input-group">
+          <span style="color:var(--text-main)">الإجابة:</span>
+          <input type="number" step="0.01" class="math-input" id="ex${i}" placeholder="؟">
+          <button class="check-btn" onclick="checkEx(${i}, ${ex.ansDecimal})">تحقق ✓</button>
+          <button onclick="showExHint(${i}, '${ex.a}', '${ex.b}', '${ex.n}', '${ex.ans}', '${ex.ansDecimal}')" 
+            style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:var(--text-main); padding:10px 16px; border-radius:10px; cursor:pointer; font-family:'Tajawal',sans-serif; font-size:0.9rem;">💡 مساعدة</button>
+        </div>
+        <div id="exfb${i}" class="feedback"></div>
+        <div id="exhint${i}" style="display:none; background:rgba(78,205,196,0.08); border-radius:10px; padding:12px; margin-top:10px; color:var(--text-main); font-size:0.9rem; border:1px solid rgba(78,205,196,0.2); direction:ltr;"></div>
+      </div>`;
+  });
+}
+
+function checkEx(i, correct) {
+  const val = parseFloat(document.getElementById('ex' + i).value);
+  const fb = document.getElementById('exfb' + i);
+  if (Math.abs(val - correct) < 0.1) {
+    fb.className = 'feedback correct';
+    fb.textContent = '✅ إجابة صحيحة! أحسنت!';
+    triggerConfetti();
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = `❌ إجابة خاطئة.`;
+  }
+}
+
+function showExHint(i, a, b, n, ans, dec) {
+  const hint = document.getElementById('exhint' + i);
+  hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
+
+  hint.innerHTML = `
+    <div dir="rtl" style="text-align:right">
+      <strong style="color:var(--secondary)">خطوات الحل:</strong><br>
+      (${fracHTML(a, b)}) × ${n} = 
+      (${a} × ${n}) : ${b} = 
+      ${fracHTML(a * n, b)} = 
+      <strong style="color:var(--success)">${dec}</strong>
+    </div>
+  `;
+}
+
+// ============================================================
+// Problems
+// ============================================================
+function initProblems() {
+  const list = document.getElementById('problemsList');
+  if (list.innerHTML.trim()) return;
+  problems.forEach((p, i) => {
+    list.innerHTML += `
+      <div class="problem-card" onclick="toggleProblem(${i})">
+        <div class="problem-number">مسألة ${p.num}</div>
+        <div class="problem-text">${p.icon} ${frac(p.text)}</div>
+        <button class="toggle-solution">🔍 عرض الحل خطوة بخطوة</button>
+        <div class="solution-panel" id="sol${i}">
+          ${p.steps.map((s, j) => `<div class="solution-step"><div class="step-num">${j+1}</div><span>${frac(s)}</span></div>`).join('')}
+          <div class="final-answer">✅ ${frac(p.answer)}</div>
+        </div>
+      </div>`;
+  });
+}
+
+function toggleProblem(i) {
+  const panel = document.getElementById('sol' + i);
+  panel.classList.toggle('open');
+}
+
+// ============================================================
+// Quiz
+// ============================================================
+function initQuiz() {
+  const cont = document.getElementById('quizContainer');
+  if (cont.innerHTML.trim()) return;
+  score = 0; answered = 0;
+  quizQuestions.forEach((q, i) => {
+    cont.innerHTML += `
+      <div class="quiz-card">
+        <div class="problem-number">سؤال ${i+1}</div>
+        <div class="question-text">${frac(q.q)}</div>
+        <div class="options-grid" id="opts${i}">
+          ${q.opts.map((o, j) => `<button class="option-btn" onclick="selectAnswer(${i},${j},${q.ans})" id="opt${i}-${j}">${o}</button>`).join('')}
+        </div>
+        <div class="feedback" id="fb${i}"></div>
+      </div>`;
+  });
+}
+
+function selectAnswer(qIdx, chosen, correct) {
+  const fb = document.getElementById('fb' + qIdx);
+  for (let j = 0; j < 4; j++) {
+    const btn = document.getElementById('opt' + qIdx + '-' + j);
+    if (btn) btn.disabled = true;
+  }
+  const chosenBtn = document.getElementById('opt' + qIdx + '-' + chosen);
+  const correctBtn = document.getElementById('opt' + qIdx + '-' + correct);
+  if (chosen === correct) {
+    chosenBtn.classList.add('correct');
+    fb.className = 'feedback correct';
+    fb.textContent = '✅ إجابة صحيحة! أحسنت!';
+    score++;
+    triggerConfetti();
+  } else {
+    chosenBtn.classList.add('wrong');
+    correctBtn.classList.add('correct');
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ إجابة خاطئة. الإجابة الصحيحة محددة باللون الأخضر.';
+  }
+  answered++;
+  if (answered === quizQuestions.length) setTimeout(showFinalScore, 800);
+}
+
+function showFinalScore() {
+  const pct = score / quizQuestions.length;
+  let stars = '⭐⭐⭐';
+  let msg = 'ممتاز! أنت متميز في هذا الدرس! 🎉';
+  if (pct < 0.5) { stars = '⭐'; msg = 'استمر في المراجعة، أنت قادر على التحسن! 💪'; }
+  else if (pct < 0.8) { stars = '⭐⭐'; msg = 'جيد! بعض المراجعة ستجعلك أفضل! 👍'; }
+
+  document.getElementById('starsDisplay').textContent = stars;
+  document.getElementById('scoreNumber').textContent = `${score} / ${quizQuestions.length}`;
+  document.getElementById('scoreMsg').textContent = msg;
+  document.getElementById('finalScore').style.display = 'block';
+  if (pct >= 0.8) triggerConfetti(50);
+}
+
+function resetQuiz() {
+  score = 0; answered = 0;
+  document.getElementById('quizContainer').innerHTML = '';
+  document.getElementById('finalScore').style.display = 'none';
+  initQuiz();
+}
+
+// ============================================================
+// Confetti
+// ============================================================
+function triggerConfetti(count = 20) {
+  const colors = ['#FF6B35','#4ECDC4','#FFE66D','#06D6A0','#EF476F'];
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left: ${Math.random() * 100}vw;
+      top: -10px;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      width: ${6+Math.random()*8}px;
+      height: ${6+Math.random()*8}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration: ${1.5+Math.random()*2}s;
+      animation-delay: ${Math.random()*0.5}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+}
+
+// ============================================================
+// Discover Section — Trapezoid Land Charts
+// ============================================================
+let discoverChartInst = null;
+let naderChartInst = null;
+
+// Calculate trapezoid areas given big base
+function calcAreas(bigBase) {
+  const smallBase = (4/5) * bigBase;
+  const height    = (5/9) * bigBase;
+  const total     = 0.5 * (bigBase + smallBase) * height;
+  const house     = (2/9)  * total;
+  const car       = (1/27) * total;
+  const garden    = total - house - car;
+  return { bigBase, smallBase, height, total, house, car, garden };
+}
+
+function initDiscoverCharts() {
+  const a = calcAreas(45);
+  buildFabricStrip(a);
+  buildDiscoverChart(a);
+  buildPieChart(a);
+}
+
+function updateDiscoverChart() {
+  const b = parseInt(document.getElementById('usageSlider').value);
+  document.getElementById('usageVal').textContent = b;
+  const a = calcAreas(b);
+  buildFabricStrip(a);
+  updateResultCards(a);
+  buildDiscoverChart(a);
+  buildPieChart(a);
+}
+
+function updateResultCards(a) {
+  document.getElementById('usedFabric').textContent = a.total.toFixed(1);
+  document.getElementById('usedFrac').textContent   = a.house.toFixed(1);
+  document.getElementById('remainFabric').textContent = a.car.toFixed(1);
+  document.getElementById('remainFrac').textContent   = a.garden.toFixed(1);
+}
+
+function buildFabricStrip(a) {
+  const strip = document.getElementById('fabricStrip');
+  strip.innerHTML = '';
+  // Proportional widths
+  const hPct = (a.house  / a.total * 100).toFixed(1);
+  const cPct = (a.car    / a.total * 100).toFixed(1);
+  const gPct = (a.garden / a.total * 100).toFixed(1);
+
+  [[hPct,'#FF6B35','🏠'],[cPct,'#FFE66D','🚗'],[gPct,'#4ECDC4','🌿']].forEach(([pct,col,label]) => {
+    const seg = document.createElement('div');
+    seg.style.cssText = `width:${pct}%; background:${col}; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; color:#1A1A2E; transition:all 0.5s ease; min-width:2px;`;
+    seg.textContent = parseFloat(pct) > 8 ? label : '';
+    strip.appendChild(seg);
+  });
+}
+
+function buildDiscoverChart(a) {
+  if (discoverChartInst) discoverChartInst.destroy();
+  const ctx = document.getElementById('discoverChart').getContext('2d');
+  discoverChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['🏠 المنزل', '🚗 السيّارة', '🌿 الحديقة', '📐 المساحة الكلية'],
+      datasets: [{
+        label: 'المساحة (م²)',
+        data: [
+          parseFloat(a.house.toFixed(2)),
+          parseFloat(a.car.toFixed(2)),
+          parseFloat(a.garden.toFixed(2)),
+          parseFloat(a.total.toFixed(2))
+        ],
+        backgroundColor: [
+          'rgba(255,107,53,0.8)',
+          'rgba(255,230,109,0.8)',
+          'rgba(78,205,196,0.8)',
+          'rgba(255,255,255,0.2)'
+        ],
+        borderColor: ['#FF6B35','#FFE66D','#4ECDC4','rgba(255,255,255,0.4)'],
+        borderWidth: 2,
+        borderRadius: 10,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          titleFont: { family: 'Tajawal', size: 13 },
+          bodyFont:  { family: 'Tajawal', size: 12 },
+          callbacks: { label: item => ` المساحة: ${item.raw} م²` }
+        },
+        datalabels: false
+      },
+      scales: {
+        x: {
+          ticks: { color: 'rgba(255,255,255,0.75)', font: { family: 'Tajawal', size: 12 } },
+          grid:  { color: 'rgba(255,255,255,0.04)' }
+        },
+        y: {
+          ticks: { color: 'rgba(255,255,255,0.6)', font: { family: 'Tajawal' }, callback: v => v + ' م²' },
+          grid:  { color: 'rgba(255,255,255,0.07)' },
+          title: { display: true, text: 'المساحة (م²)', color: 'rgba(255,255,255,0.45)', font: { family: 'Tajawal' } }
+        }
+      }
+    }
+  });
+}
+
+function buildPieChart(a) {
+  if (naderChartInst) naderChartInst.destroy();
+  const ctx = document.getElementById('naderChart').getContext('2d');
+  naderChartInst = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: [
+        `🏠 المنزل — ${a.house.toFixed(1)} م²`,
+        `🚗 السيّارة — ${a.car.toFixed(1)} م²`,
+        `🌿 الحديقة — ${a.garden.toFixed(1)} م²`
+      ],
+      datasets: [{
+        data: [
+          parseFloat(a.house.toFixed(2)),
+          parseFloat(a.car.toFixed(2)),
+          parseFloat(a.garden.toFixed(2))
+        ],
+        backgroundColor: ['rgba(255,107,53,0.85)','rgba(255,230,109,0.85)','rgba(78,205,196,0.85)'],
+        borderColor: ['#FF6B35','#FFE66D','#4ECDC4'],
+        borderWidth: 3,
+        hoverOffset: 14
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '58%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: 'rgba(255,255,255,0.8)', font: { family: 'Tajawal', size: 12 }, padding: 18 }
+        },
+        tooltip: {
+          titleFont: { family: 'Tajawal' },
+          bodyFont:  { family: 'Tajawal' },
+          callbacks: {
+            label: item => {
+              const pct = (item.raw / a.total * 100).toFixed(1);
+              return ` ${item.raw} م² (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Init
+updateProgress();
+formatFractions();
+setTimeout(() => {
+  initDiscoverCharts();
+  updateResultCards(calcAreas(45));
+}, 150);
+
+</script>
+
+</body>
+</html>

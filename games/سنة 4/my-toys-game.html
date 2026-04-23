@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Toys - Learning Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---- Floating Bubbles Background ---- */
+  .bubbles {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bubbles span {
+    position: absolute; bottom: -80px; width: 40px; height: 40px;
+    background: rgba(255,255,255,0.12); border-radius: 50%;
+    animation: rise 12s infinite ease-in;
+  }
+  .bubbles span:nth-child(1) { width:80px;height:80px;left:10%;animation-duration:14s;animation-delay:1s }
+  .bubbles span:nth-child(2) { width:50px;height:50px;left:30%;animation-duration:10s;animation-delay:3s }
+  .bubbles span:nth-child(3) { width:60px;height:60px;left:50%;animation-duration:16s;animation-delay:0s }
+  .bubbles span:nth-child(4) { width:35px;height:35px;left:70%;animation-duration:11s;animation-delay:4s }
+  .bubbles span:nth-child(5) { width:70px;height:70px;left:85%;animation-duration:13s;animation-delay:2s }
+  @keyframes rise {
+    0%   { bottom:-80px; transform:translateX(0) rotate(0deg); opacity:1; }
+    100% { bottom:110%; transform:translateX(80px) rotate(720deg); opacity:0; }
+  }
+
+  /* ---- Screens ---- */
+  .screen { display:none; position:relative; z-index:1; }
+  .screen.active { display:flex; flex-direction:column; align-items:center; }
+
+  /* ---- Start Screen ---- */
+  #start-screen {
+    justify-content: center; min-height: 100vh; text-align: center; padding: 20px;
+  }
+  .game-title {
+    font-family: 'Fredoka One', cursive; font-size: 3.2rem; color: #fff;
+    text-shadow: 4px 4px 0 rgba(0,0,0,0.2); margin-bottom: 10px;
+    animation: bounce-title 2s infinite;
+  }
+  @keyframes bounce-title {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-10px); }
+  }
+  .subtitle { color: #e0d4f7; font-size: 1.2rem; margin-bottom: 30px; }
+  .toy-parade {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 30px;
+  }
+  .toy-parade span {
+    font-size: 2.8rem; animation: wiggle 1.5s infinite;
+  }
+  .toy-parade span:nth-child(2n) { animation-delay: 0.3s; }
+  .toy-parade span:nth-child(3n) { animation-delay: 0.6s; }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(0deg); }
+    25%     { transform: rotate(15deg); }
+    75%     { transform: rotate(-15deg); }
+  }
+
+  /* Buttons */
+  .btn {
+    font-family: 'Fredoka One', cursive; font-size: 1.3rem; padding: 15px 40px;
+    border: none; border-radius: 50px; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s; margin: 8px;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 9px 0 rgba(0,0,0,0.2); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+  .btn-play   { background: #ff6b6b; color: #fff; }
+  .btn-learn  { background: #feca57; color: #333; }
+  .btn-match  { background: #48dbfb; color: #fff; }
+  .btn-quiz   { background: #ff9ff3; color: #fff; }
+  .btn-back   { background: #fff; color: #764ba2; font-size: 1rem; padding: 10px 25px; }
+  .btn-restart{ background: #1dd1a1; color: #fff; }
+
+  /* ---- Learn Screen ---- */
+  #learn-screen { min-height:100vh; padding:20px; }
+  .learn-header { color:#fff; font-family:'Fredoka One',cursive; font-size:1.8rem; margin:15px 0; }
+  .toy-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px; max-width: 800px; width: 100%; padding: 10px;
+  }
+  .toy-card {
+    background: #fff; border-radius: 20px; padding: 20px 10px;
+    text-align: center; cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .toy-card:hover { transform: translateY(-6px) scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+  .toy-card .emoji { font-size: 3.5rem; display: block; margin-bottom: 8px; }
+  .toy-card .name { font-family:'Fredoka One',cursive; font-size:1.1rem; color:#764ba2; }
+  .toy-card.played { animation: pop 0.4s ease; }
+  @keyframes pop {
+    0%   { transform:scale(1); }
+    50%  { transform:scale(1.2); }
+    100% { transform:scale(1); }
+  }
+
+  /* ---- Match Game ---- */
+  #match-screen { min-height:100vh; padding:20px; }
+  .game-hud {
+    display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;
+  }
+  .hud-item {
+    background: rgba(255,255,255,0.2); color: #fff; padding: 8px 20px;
+    border-radius: 30px; font-weight: 700; font-size: 1.1rem;
+  }
+  .match-area {
+    display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;
+    max-width: 900px; width: 100%;
+  }
+  .match-column {
+    flex: 1; min-width: 200px; max-width: 350px;
+  }
+  .match-column h3 {
+    color: #fff; font-family:'Fredoka One',cursive; text-align:center; margin-bottom:10px;
+  }
+  .match-item {
+    background: #fff; border-radius: 14px; padding: 12px 16px; margin: 8px 0;
+    text-align: center; cursor: pointer; font-weight: 700; font-size: 1.1rem;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1); user-select: none;
+  }
+  .match-item:hover { transform: scale(1.04); }
+  .match-item.selected { background: #feca57; transform: scale(1.06); box-shadow: 0 0 0 3px #feca57; }
+  .match-item.correct { background: #1dd1a1; color:#fff; pointer-events:none; }
+  .match-item.wrong { background: #ff6b6b; color:#fff; animation: shake 0.4s; }
+  .match-item .emoji { font-size: 2rem; }
+  @keyframes shake {
+    0%,100% { transform:translateX(0); }
+    25%     { transform:translateX(-8px); }
+    75%     { transform:translateX(8px); }
+  }
+
+  /* ---- Quiz Screen ---- */
+  #quiz-screen { min-height:100vh; padding:20px; }
+  .quiz-question {
+    color:#fff; font-family:'Fredoka One',cursive; font-size:2rem; margin:15px 0;
+  }
+  .quiz-toy { font-size:6rem; margin:10px 0; animation: wiggle 1.5s infinite; }
+  .quiz-options {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    max-width: 450px; width: 100%; margin-top: 15px;
+  }
+  .quiz-opt {
+    background: #fff; border-radius: 16px; padding: 14px; font-size: 1.2rem;
+    font-weight: 700; cursor: pointer; text-align: center;
+    transition: transform 0.2s, background 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .quiz-opt:hover { transform: translateY(-3px); }
+  .quiz-opt.correct { background: #1dd1a1; color:#fff; }
+  .quiz-opt.wrong { background: #ff6b6b; color:#fff; animation: shake 0.4s; }
+  .quiz-opt.disabled { pointer-events: none; opacity: 0.6; }
+
+  /* ---- Result Screen ---- */
+  #result-screen { min-height:100vh; padding:20px; justify-content:center; text-align:center; }
+  .result-emoji { font-size:5rem; margin:15px 0; }
+  .result-text { color:#fff; font-family:'Fredoka One',cursive; font-size:2rem; margin:10px 0; }
+  .result-score { color:#feca57; font-family:'Fredoka One',cursive; font-size:3rem; }
+  .stars { font-size:3rem; margin:10px 0; }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 500px) {
+    .game-title { font-size: 2.2rem; }
+    .toy-grid { grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); }
+    .quiz-options { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating Bubbles -->
+<div class="bubbles"><span></span><span></span><span></span><span></span><span></span></div>
+
+<!-- ========== START SCREEN ========== -->
+<div id="start-screen" class="screen active">
+  <div class="game-title">My Toys</div>
+  <p class="subtitle">A fun game to learn toy names!</p>
+  <div class="toy-parade">
+    <span>🧸</span><span>🚗</span><span>🎈</span><span>🪁</span><span>🧩</span><span>🎨</span><span>🚂</span><span>⚽</span>
+  </div>
+  <button class="btn btn-learn" onclick="showScreen('learn-screen')">Learn Toys</button>
+  <button class="btn btn-match" onclick="startMatch()">Match Game</button>
+  <button class="btn btn-quiz" onclick="startQuiz()">Quiz Game</button>
+</div>
+
+<!-- ========== LEARN SCREEN ========== -->
+<div id="learn-screen" class="screen">
+  <div class="learn-header">Click a toy to hear its name!</div>
+  <div class="toy-grid" id="toy-grid"></div>
+  <button class="btn btn-back" onclick="showScreen('start-screen')">Back</button>
+</div>
+
+<!-- ========== MATCH SCREEN ========== -->
+<div id="match-screen" class="screen">
+  <div class="game-hud">
+    <div class="hud-item">Score: <span id="match-score">0</span></div>
+    <div class="hud-item">Pairs: <span id="match-pairs">0</span>/<span id="match-total">0</span></div>
+  </div>
+  <div class="match-area">
+    <div class="match-column">
+      <h3>Toys</h3>
+      <div id="match-emojis"></div>
+    </div>
+    <div class="match-column">
+      <h3>Names</h3>
+      <div id="match-names"></div>
+    </div>
+  </div>
+  <button class="btn btn-back" onclick="showScreen('start-screen')">Back</button>
+</div>
+
+<!-- ========== QUIZ SCREEN ========== -->
+<div id="quiz-screen" class="screen">
+  <div class="game-hud">
+    <div class="hud-item">Score: <span id="quiz-score">0</span></div>
+    <div class="hud-item">Question: <span id="quiz-num">1</span>/<span id="quiz-total">10</span></div>
+  </div>
+  <div class="quiz-question">What toy is this?</div>
+  <div class="quiz-toy" id="quiz-toy"></div>
+  <div class="quiz-options" id="quiz-options"></div>
+</div>
+
+<!-- ========== RESULT SCREEN ========== -->
+<div id="result-screen" class="screen">
+  <div class="result-emoji" id="result-emoji"></div>
+  <div class="result-text" id="result-text"></div>
+  <div class="stars" id="result-stars"></div>
+  <div class="result-score" id="result-score"></div>
+  <button class="btn btn-restart" onclick="showScreen('start-screen')">Play Again</button>
+</div>
+
+<script>
+// ==================== TOY DATA ====================
+const toys = [
+  { emoji: "🧸", name: "Teddy Bear" },
+  { emoji: "🚗", name: "Car" },
+  { emoji: "⚽", name: "Ball" },
+  { emoji: "🪁", name: "Kite" },
+  { emoji: "🧩", name: "Puzzle" },
+  { emoji: "🎨", name: "Crayons" },
+  { emoji: "🚂", name: "Train" },
+  { emoji: "🎸", name: "Guitar" },
+  { emoji: "🪀", name: "Yo-Yo" },
+  { emoji: "🧶", name: "Yarn Ball" },
+  { emoji: "🎯", name: "Dartboard" },
+  { emoji: "🪅", name: "Pinata" },
+  { emoji: "🎪", name: "Tent" },
+  { emoji: "🤖", name: "Robot" },
+  { emoji: "🎮", name: "Game Controller" },
+  { emoji: "🪆", name: "Matryoshka" },
+  { emoji: "🎺", name: "Trumpet" },
+  { emoji: "🧲", name: "Magnet" },
+  { emoji: "🎲", name: "Dice" },
+  { emoji: "🪄", name: "Magic Wand" },
+];
+
+// ==================== AUDIO ====================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  return audioCtx;
+}
+
+function playTone(freq, dur, type='sine') {
+  try {
+    const ctx = getAudioCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.value = 0.15;
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function playCorrect() {
+  playTone(523, 0.15); setTimeout(()=>playTone(659, 0.15), 100); setTimeout(()=>playTone(784, 0.3), 200);
+}
+function playWrong() {
+  playTone(200, 0.3, 'square');
+}
+function playClick() {
+  playTone(440, 0.08);
+}
+function playWin() {
+  [523,587,659,698,784,880].forEach((f,i) => setTimeout(()=>playTone(f,0.2), i*100));
+}
+
+// ==================== SPEECH ====================
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.85; u.pitch = 1.2; u.lang = 'en-US';
+    window.speechSynthesis.speak(u);
+  }
+}
+
+// ==================== HELPERS ====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ==================== LEARN MODE ====================
+function buildLearnGrid() {
+  const grid = document.getElementById('toy-grid');
+  grid.innerHTML = '';
+  toys.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'toy-card';
+    card.innerHTML = `<span class="emoji">${t.emoji}</span><span class="name">${t.name}</span>`;
+    card.onclick = () => {
+      speak(t.name);
+      playClick();
+      card.classList.remove('played');
+      void card.offsetWidth;
+      card.classList.add('played');
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ==================== MATCH GAME ====================
+let matchData = [], matchSelected = null, matchPairs = 0, matchScore = 0, matchTotal = 0;
+
+function startMatch() {
+  matchScore = 0; matchPairs = 0;
+  const subset = shuffle(toys).slice(0, 6);
+  matchTotal = subset.length;
+  matchData = subset;
+  matchSelected = null;
+
+  const emojisCol = document.getElementById('match-emojis');
+  const namesCol = document.getElementById('match-names');
+  emojisCol.innerHTML = ''; namesCol.innerHTML = '';
+
+  const shuffledNames = shuffle(subset);
+  subset.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.dataset.index = i;
+    div.innerHTML = `<span class="emoji">${t.emoji}</span>`;
+    div.onclick = () => selectMatch(div, i, 'emoji');
+    emojisCol.appendChild(div);
+  });
+  shuffledNames.forEach((t) => {
+    const origIdx = subset.indexOf(t);
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.dataset.index = origIdx;
+    div.textContent = t.name;
+    div.onclick = () => selectMatch(div, origIdx, 'name');
+    namesCol.appendChild(div);
+  });
+
+  document.getElementById('match-score').textContent = 0;
+  document.getElementById('match-pairs').textContent = 0;
+  document.getElementById('match-total').textContent = matchTotal;
+  showScreen('match-screen');
+}
+
+function selectMatch(el, idx, type) {
+  if (el.classList.contains('correct')) return;
+  playClick();
+
+  if (!matchSelected) {
+    matchSelected = { el, idx, type };
+    el.classList.add('selected');
+  } else {
+    if (matchSelected.type === type) {
+      matchSelected.el.classList.remove('selected');
+      matchSelected = { el, idx, type };
+      el.classList.add('selected');
+      return;
+    }
+    if (matchSelected.idx === idx) {
+      // Correct match
+      matchSelected.el.classList.remove('selected');
+      matchSelected.el.classList.add('correct');
+      el.classList.add('correct');
+      matchPairs++;
+      matchScore += 10;
+      document.getElementById('match-score').textContent = matchScore;
+      document.getElementById('match-pairs').textContent = matchPairs;
+      playCorrect();
+      speak(matchData[idx].name);
+      matchSelected = null;
+      if (matchPairs === matchTotal) {
+        setTimeout(() => showResult(matchScore, matchTotal * 10, 'match'), 600);
+      }
+    } else {
+      // Wrong match
+      matchSelected.el.classList.remove('selected');
+      matchSelected.el.classList.add('wrong');
+      el.classList.add('wrong');
+      playWrong();
+      const prev = matchSelected.el;
+      setTimeout(() => { prev.classList.remove('wrong'); el.classList.remove('wrong'); }, 500);
+      matchSelected = null;
+    }
+  }
+}
+
+// ==================== QUIZ GAME ====================
+let quizList = [], quizIdx = 0, quizScore = 0;
+
+function startQuiz() {
+  quizScore = 0; quizIdx = 0;
+  quizList = shuffle(toys).slice(0, 10);
+  showScreen('quiz-screen');
+  loadQuizQuestion();
+}
+
+function loadQuizQuestion() {
+  if (quizIdx >= quizList.length) {
+    showResult(quizScore, quizList.length * 10, 'quiz');
+    return;
+  }
+  const current = quizList[quizIdx];
+  document.getElementById('quiz-toy').textContent = current.emoji;
+  document.getElementById('quiz-score').textContent = quizScore;
+  document.getElementById('quiz-num').textContent = quizIdx + 1;
+  document.getElementById('quiz-total').textContent = quizList.length;
+
+  // Generate 4 options
+  let options = [current];
+  const pool = toys.filter(t => t.name !== current.name);
+  while (options.length < 4) {
+    const r = pool[Math.floor(Math.random() * pool.length)];
+    if (!options.includes(r)) options.push(r);
+  }
+  options = shuffle(options);
+
+  const container = document.getElementById('quiz-options');
+  container.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt.name;
+    btn.onclick = () => answerQuiz(btn, opt.name === current.name, current.name);
+    container.appendChild(btn);
+  });
+}
+
+function answerQuiz(btn, correct, name) {
+  const allBtns = document.querySelectorAll('.quiz-opt');
+  allBtns.forEach(b => b.classList.add('disabled'));
+
+  if (correct) {
+    btn.classList.add('correct');
+    quizScore += 10;
+    playCorrect();
+    speak(name);
+  } else {
+    btn.classList.add('wrong');
+    playWrong();
+    // Highlight correct answer
+    allBtns.forEach(b => { if (b.textContent === name) b.classList.add('correct'); });
+  }
+  document.getElementById('quiz-score').textContent = quizScore;
+  quizIdx++;
+  setTimeout(loadQuizQuestion, 1200);
+}
+
+// ==================== RESULT ====================
+function showResult(score, max, type) {
+  const pct = score / max;
+  let emoji, text;
+  if (pct >= 0.9)      { emoji = '🏆'; text = 'Amazing!'; }
+  else if (pct >= 0.7)  { emoji = '🌟'; text = 'Great Job!'; }
+  else if (pct >= 0.5)  { emoji = '👍'; text = 'Good Try!'; }
+  else                   { emoji = '💪'; text = 'Keep Practicing!'; }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-text').textContent = text;
+  document.getElementById('result-score').textContent = score + ' / ' + max;
+
+  const starCount = Math.round(pct * 5);
+  document.getElementById('result-stars').textContent = '⭐'.repeat(starCount) + '☆'.repeat(5 - starCount);
+
+  playWin();
+  showScreen('result-screen');
+}
+
+// ==================== INIT ====================
+buildLearnGrid();
+</script>
+</body>
+</html>
