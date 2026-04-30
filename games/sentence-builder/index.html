@@ -2191,12 +2191,24 @@ function updateProgressBar(idx) {
 }
 
 // ===== PLAY STEP =====
+let _stepAdvanced = false;
+
+function advanceStep(stepId, delay) {
+  if (_stepAdvanced) return;
+  _stepAdvanced = true;
+  stopBeakAnim();
+  markStepDone(stepId);
+  audioIdx++;
+  setTimeout(() => playStep(audioIdx), delay);
+}
+
 function playStep(idx) {
   if (idx >= MP3_STEPS.length) {
-    // انتهى الشرح
     finishSpeech();
     return;
   }
+
+  _stepAdvanced = false;
 
   const { file, stepId } = MP3_STEPS[idx];
   updateProgressBar(idx);
@@ -2205,33 +2217,16 @@ function playStep(idx) {
   const audio = new Audio(AUDIO_DATA[file] || file);
   currentAudio = audio;
 
-  audio.onplay = () => {
-    startBeakAnim();
-  };
+  audio.onplay = () => { startBeakAnim(); };
 
-  audio.onended = () => {
-    stopBeakAnim();
-    markStepDone(stepId);
-    audioIdx++;
-    setTimeout(() => playStep(audioIdx), 400);
-  };
+  audio.onended = () => { advanceStep(stepId, 400); };
 
   audio.onerror = () => {
-    // إذا لم يجد الملف، تجاوز للخطوة التالية
     console.warn(`ملف الصوت غير موجود: ${file}`);
-    stopBeakAnim();
-    markStepDone(stepId);
-    audioIdx++;
-    setTimeout(() => playStep(audioIdx), 200);
+    advanceStep(stepId, 200);
   };
 
-  audio.play().catch(() => {
-    // تجاوز إذا فشل التشغيل
-    stopBeakAnim();
-    markStepDone(stepId);
-    audioIdx++;
-    setTimeout(() => playStep(audioIdx), 200);
-  });
+  audio.play().catch(() => { advanceStep(stepId, 200); });
 }
 
 function finishSpeech() {
